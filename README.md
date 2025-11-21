@@ -1,73 +1,123 @@
-# React + TypeScript + Vite
+# Atlas Viewer
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A dynamic, interactive viewer for the Sky Atlas documentation with advanced comparison and navigation features.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### 📚 Core Viewing
+- **Collapsible Tree Structure** - Browse the entire Atlas documentation hierarchy
+- **Dynamic Data Loading** - Automatically displays all sections from any array field containing document nodes
+- **Markdown Rendering** - Full markdown support for all content sections
+- **Dark Mode** - Professional dark theme using Mantine UI
 
-## React Compiler
+### ⌨️ Navigation
+- **Keyboard Controls**:
+  - `←` / `→` - Navigate between nodes
+  - `↑` / `↓` - Navigate and collapse nodes
+  - `Enter` / `Space` - Toggle expansion
+- **Click Navigation** - Expand/collapse nodes and navigate the tree
+- **Visual Selection** - Selected nodes display with:
+  - Larger font sizes
+  - Highlighted borders
+  - Automatic scroll-to-view
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### 📊 Advanced Features
+- **Child Count Display** - See how many descendants each node has
+- **Expand All** - Recursively expand entire branches
+- **Collapse All** - Reset view to top-level scopes
 
-## Expanding the ESLint configuration
+### 🔬 Agent Comparison
+- **Side-by-Side View** - Compare Spark, Grove, Launch Agent 4, and the Template simultaneously
+- **Structural Alignment** - Sections align by position (doc_no suffix), not name
+- **Missing Section Indicators** - Blank spaces show when sections exist in some agents but not others
+- **Agent Template Display** - Reference template for creating new agents
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Installation
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+```bash
+# Install dependencies
+npm install
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+# Start development server
+npm run dev
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+# Build for production
+npm run build
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Data Structure
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+The viewer dynamically handles any JSON tree structure with the following node format:
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```json
+{
+  "type": "Scope|Article|Section|Core|Primary",
+  "doc_no": "A.1.2.3",
+  "name": "Section Name",
+  "uuid": "unique-identifier",
+  "content": "Markdown content...",
+  "sections_and_primary_docs": [],
+  "articles": [],
+  "agent_scope_database": [],
+  "annotations": [],
+  "tenets": [],
+  "active_data": [],
+  "needed_research": [],
+  "scenarios": [],
+  "scenario_variations": []
+}
 ```
+
+The viewer will automatically detect and display children from **any** array field containing document nodes (objects with `type`, `doc_no`, `name`, and `uuid` fields).
+
+## Updating Data
+
+To update the Atlas data:
+
+1. Replace `/public/atlas-2025-11-20.json` with your updated file
+2. Refresh the browser (no rebuild needed)
+
+The filename is currently hardcoded. To use a different filename, update the fetch URL in `src/App.tsx`.
+
+## Agent Template
+
+The `agent-template.json` file contains a template generated by comparing Spark, Grove, and Launch Agent 4. It includes:
+
+- **All sections** that appear in all three reference agents
+- **Variables**: `N` for agent number, `NAME` for agent name, etc.
+- **Preserved structure**: Common doc_no patterns like `A.6.1.1.N.2.1`
+
+See `agent-template-README.md` for detailed usage instructions.
+
+## Technology Stack
+
+- **React 18** - UI framework
+- **TypeScript** - Type safety
+- **Vite** - Build tool and dev server
+- **Mantine UI** - Component library and dark theme
+- **React Markdown** - Markdown rendering
+- **Tabler Icons** - Icon set
+
+## Project Structure
+
+```
+atlas-viewer/
+├── public/
+│   ├── atlas-2025-11-20.json      # Main Atlas data
+│   └── agent-template.json         # Agent template
+├── src/
+│   ├── App.tsx                     # Main application
+│   ├── TreeNode.tsx                # Collapsible tree component
+│   ├── AgentComparisonAligned.tsx  # Side-by-side comparison
+│   └── types.ts                    # TypeScript interfaces
+├── agent-template-README.md        # Template documentation
+└── README.md                       # This file
+```
+
+## Contributing
+
+This viewer is designed to be generic and handle any Atlas JSON structure. The tree traversal automatically detects document nodes in any array field, making it adaptable to schema changes.
+
+## License
+
+[Add your license here]
