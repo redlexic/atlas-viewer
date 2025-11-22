@@ -6,6 +6,42 @@ interface AgentComparisonProps {
   agents: { name: string; node: AtlasNode }[];
 }
 
+// Rainbow colors for doc_no segments
+const rainbowColors = [
+  '#DC2626', // red
+  '#EA580C', // orange
+  '#D97706', // amber
+  '#CA8A04', // yellow
+  '#65A30D', // lime
+  '#16A34A', // green
+  '#059669', // emerald
+  '#0D9488', // teal
+  '#0891B2', // cyan
+  '#0284C7', // sky
+  '#2563EB', // blue
+  '#4F46E5', // indigo
+  '#7C3AED', // violet
+  '#9333EA', // purple
+  '#C026D3', // fuchsia
+  '#DB2777', // pink
+];
+
+const getSegmentColor = (index: number) => rainbowColors[index % rainbowColors.length];
+
+const ColoredDocNo = ({ docNo }: { docNo: string }) => {
+  const segments = docNo.split('.');
+  return (
+    <>
+      {segments.map((segment, index) => (
+        <span key={index}>
+          {index > 0 && <span style={{ color: '#666' }}>.</span>}
+          <span style={{ color: getSegmentColor(index) }}>{segment}</span>
+        </span>
+      ))}
+    </>
+  );
+};
+
 const getChildren = (node: AtlasNode): AtlasNode[] => {
   const children: AtlasNode[] = [];
   for (const key in node) {
@@ -34,7 +70,7 @@ const NodeView = ({ node, level = 0 }: { node: AtlasNode; level?: number }) => {
         }}
       >
         <Group gap="xs" mb={4}>
-          <Text size="xs" fw={700} c="blue.6">{node.doc_no}</Text>
+          <Text size="xs" fw={700}><ColoredDocNo docNo={node.doc_no} /></Text>
           <Badge size="xs" variant="light">{node.type}</Badge>
         </Group>
         <Text size="xs" fw={500} mb={node.content ? 4 : 0}>{node.name}</Text>

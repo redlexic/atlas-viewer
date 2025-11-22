@@ -4,6 +4,42 @@ import ReactMarkdown from 'react-markdown';
 import { useEffect, useRef } from 'react';
 import type { TreeNodeProps, AtlasNode } from './types';
 
+// Rainbow colors for doc_no segments
+const rainbowColors = [
+  '#DC2626', // red
+  '#EA580C', // orange
+  '#D97706', // amber
+  '#CA8A04', // yellow
+  '#65A30D', // lime
+  '#16A34A', // green
+  '#059669', // emerald
+  '#0D9488', // teal
+  '#0891B2', // cyan
+  '#0284C7', // sky
+  '#2563EB', // blue
+  '#4F46E5', // indigo
+  '#7C3AED', // violet
+  '#9333EA', // purple
+  '#C026D3', // fuchsia
+  '#DB2777', // pink
+];
+
+const getSegmentColor = (index: number) => rainbowColors[index % rainbowColors.length];
+
+const ColoredDocNo = ({ docNo }: { docNo: string }) => {
+  const segments = docNo.split('.');
+  return (
+    <>
+      {segments.map((segment, index) => (
+        <span key={index}>
+          {index > 0 && <span style={{ color: '#666' }}>.</span>}
+          <span style={{ color: getSegmentColor(index) }}>{segment}</span>
+        </span>
+      ))}
+    </>
+  );
+};
+
 const getNodeColor = (type: string) => {
   const colors: Record<string, string> = {
     'Scope': 'blue',
@@ -107,8 +143,8 @@ export const TreeNode = ({ node, level, expandedNodes, selectedNodeId, onToggle,
 
             <Box style={{ flex: 1 }}>
               <Group gap="xs">
-                <Text size={isSelected ? 'xl' : 'sm'} fw={700} c={`${getNodeColor(node.type)}.6`}>
-                  {node.doc_no}
+                <Text size={isSelected ? 'xl' : 'sm'} fw={700}>
+                  <ColoredDocNo docNo={node.doc_no} />
                 </Text>
                 <Badge size={isSelected ? 'lg' : 'xs'} color={getNodeColor(node.type)} variant="light">
                   {node.type}

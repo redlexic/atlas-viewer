@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Container, Title, Text, Loader, Center, Box, Group, Button } from '@mantine/core';
+import { Container, Title, Text, Loader, Center, Box, Group, Button, Checkbox } from '@mantine/core';
 import { IconFolder, IconFolderOpen } from '@tabler/icons-react';
 import { TreeNode } from './TreeNode';
 import { AgentComparisonAligned } from './AgentComparisonAligned';
@@ -105,13 +105,23 @@ function App() {
   const [error, setError] = useState<string | null>(null);
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
+  const [visibleAgents, setVisibleAgents] = useState<Record<string, boolean>>({
+    'Spark': true,
+    'Grove': true,
+    'Keel': true,
+    'Launch Agent 3': true,
+    'Launch Agent 4': true,
+    'Prysm': true,
+    '📋 Template': true
+  });
 
   useEffect(() => {
     Promise.all([
       fetch('/atlas-2025-11-20.json').then(res => res.json()),
-      fetch('/agent-template.json').then(res => res.json())
+      fetch('/agent-template.json').then(res => res.json()),
+      fetch('/prysm-agent.json').then(res => res.json())
     ])
-      .then(([atlasData, templateData]) => {
+      .then(([atlasData, templateData, prysmData]) => {
         const processedData = preprocessData(atlasData);
 
         // Wrap template with a special wrapper node
@@ -126,15 +136,23 @@ function App() {
           childCount: preprocessNode(templateData) + 1
         };
 
-        // Extract the three agents for comparison
+        // Extract all agents for comparison
         const spark = findNodeByDocNo(processedData, 'A.6.1.1.1');
         const grove = findNodeByDocNo(processedData, 'A.6.1.1.2');
-        const launch = findNodeByDocNo(processedData, 'A.6.1.1.5');
+        const keel = findNodeByDocNo(processedData, 'A.6.1.1.3');
+        const launch3 = findNodeByDocNo(processedData, 'A.6.1.1.4');
+        const launch4 = findNodeByDocNo(processedData, 'A.6.1.1.5');
+
+        // Preprocess Prysm data
+        preprocessNode(prysmData);
 
         const agents = [];
         if (spark) agents.push({ name: 'Spark', node: spark });
         if (grove) agents.push({ name: 'Grove', node: grove });
-        if (launch) agents.push({ name: 'Launch Agent 4', node: launch });
+        if (keel) agents.push({ name: 'Keel', node: keel });
+        if (launch3) agents.push({ name: 'Launch Agent 3', node: launch3 });
+        if (launch4) agents.push({ name: 'Launch Agent 4', node: launch4 });
+        agents.push({ name: 'Prysm', node: prysmData });
 
         setAtlasData(processedData);
         setAgentTemplate(templateWrapper);
@@ -361,16 +379,32 @@ function App() {
           </>
         )}
 
-        {comparisonAgents.length === 3 && agentTemplate && (
+        {comparisonAgents.length === 6 && agentTemplate && (
           <>
             <Box my="xl" py="md" style={{ borderTop: '2px dashed var(--mantine-color-gray-6)' }}>
               <Text size="xs" c="dimmed" ta="center">Agent Comparison View</Text>
             </Box>
+            <Group justify="center" mb="md">
+              {[...comparisonAgents, { name: '📋 Template', node: agentTemplate.agent_scope_database![0] }].map(agent => (
+                <Checkbox
+                  key={agent.name}
+                  label={agent.name}
+                  checked={visibleAgents[agent.name]}
+                  onChange={(e) => {
+                    const checked = e.currentTarget.checked;
+                    setVisibleAgents(prev => ({
+                      ...prev,
+                      [agent.name]: checked
+                    }));
+                  }}
+                />
+              ))}
+            </Group>
             <AgentComparisonAligned
               agents={[
                 ...comparisonAgents,
                 { name: '📋 Template', node: agentTemplate.agent_scope_database![0] }
-              ]}
+              ].filter(agent => visibleAgents[agent.name])}
             />
           </>
         )}
