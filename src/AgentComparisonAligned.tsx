@@ -2,6 +2,7 @@ import { useState, memo } from 'react';
 import { Box, Text, Paper, Group, Badge, ActionIcon, Radio, Button, TextInput, Stack } from '@mantine/core';
 import { IconChevronRight, IconChevronDown, IconFolderOpen, IconFolder, IconEdit, IconCheck } from '@tabler/icons-react';
 import ReactMarkdown from 'react-markdown';
+import rehypeRaw from 'rehype-raw';
 import type { AtlasNode } from './types';
 
 interface AgentComparisonAlignedProps {
@@ -40,7 +41,7 @@ const rainbowColors = [
 
 const getSegmentColor = (index: number) => rainbowColors[index % rainbowColors.length];
 
-// Substitute variables in content
+// Substitute variables in content and highlight them in green
 const substituteVariables = (content: string, agentName: string, tokenSymbol: string): string => {
   if (!content) return content;
 
@@ -50,24 +51,24 @@ const substituteVariables = (content: string, agentName: string, tokenSymbol: st
 
   let result = content;
 
-  // Replace agent names
+  // Replace agent names with green-highlighted version
   if (agentName) {
     agentNames.forEach(name => {
       // Replace exact matches (case-sensitive to preserve formatting)
       const regex = new RegExp(name, 'g');
-      result = result.replace(regex, agentName);
+      result = result.replace(regex, `<span style="color: #4ade80; font-weight: 600;">${agentName}</span>`);
 
       // Also handle possessive forms
       const possessiveRegex = new RegExp(`${name}'s`, 'g');
-      result = result.replace(possessiveRegex, `${agentName}'s`);
+      result = result.replace(possessiveRegex, `<span style="color: #4ade80; font-weight: 600;">${agentName}'s</span>`);
     });
   }
 
-  // Replace token symbols
+  // Replace token symbols with green-highlighted version
   if (tokenSymbol) {
     tokenSymbols.forEach(symbol => {
       const regex = new RegExp(`\\b${symbol}\\b`, 'g');
-      result = result.replace(regex, tokenSymbol);
+      result = result.replace(regex, `<span style="color: #4ade80; font-weight: 600;">${tokenSymbol}</span>`);
     });
   }
 
@@ -313,7 +314,26 @@ const AlignedNodeRow = memo(({
               >
                 {(() => {
                   const selectedNode = selectedSections[docNoSuffix].node;
-                  const childCount = countAllChildren(selectedNode);
+
+                  // Count how many children of this node are actually selected in Builder
+                  const countSelectedChildren = (node: AtlasNode): number => {
+                    const children = getChildren(node);
+                    let count = 0;
+
+                    children.forEach(child => {
+                      // Check if this child is selected in the builder
+                      const childSuffix = getDocNoSuffix(child.doc_no);
+                      if (selectedSections[childSuffix]) {
+                        count++;
+                        // Recursively count selected descendants
+                        count += countSelectedChildren(child);
+                      }
+                    });
+
+                    return count;
+                  };
+
+                  const builderChildCount = countSelectedChildren(selectedNode);
 
                   // Apply variable substitution
                   const substitutedName = substituteVariables(selectedNode.name, builderAgentName, builderTokenSymbol);
@@ -330,19 +350,23 @@ const AlignedNodeRow = memo(({
                         <Badge size="xs" variant="light" color="green">
                           {selectedNode.type}
                         </Badge>
-                        {childCount > 0 && (
+                        {builderChildCount > 0 && (
                           <Badge size="xs" variant="filled" color="gray">
-                            {childCount}
+                            {builderChildCount}
                           </Badge>
                         )}
                       </Group>
-                      <Text size="xs" fw={500} mb={substitutedContent ? 4 : 0} style={{ wordBreak: 'break-word' }}>
-                        {substitutedName}
-                      </Text>
+                      <Text
+                        size="xs"
+                        fw={500}
+                        mb={substitutedContent ? 4 : 0}
+                        style={{ wordBreak: 'break-word' }}
+                        dangerouslySetInnerHTML={{ __html: substitutedName }}
+                      />
                       {substitutedContent && (
                         <Paper p="xs" bg="dark.8" mt="xs" style={{ overflow: 'hidden' }}>
                           <Text size="xs" style={{ fontSize: '0.7rem', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
-                            <ReactMarkdown>{substitutedContent}</ReactMarkdown>
+                            <ReactMarkdown rehypePlugins={[rehypeRaw]}>{substitutedContent}</ReactMarkdown>
                           </Text>
                         </Paper>
                       )}
