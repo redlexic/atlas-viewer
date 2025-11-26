@@ -62,6 +62,7 @@ export function ComparisonPage() {
     'Launch Agent 3': true,
     'Launch Agent 4': true,
     'Prysm': true,
+    'Launch Agent 6': true,
     'Builder': true
   });
   const [selectedSections, setSelectedSections] = useState<Record<string, { agentName: string; node: AtlasNode }>>({});
@@ -69,14 +70,16 @@ export function ComparisonPage() {
   // Builder variables
   const [builderAgentName, setBuilderAgentName] = useState('');
   const [builderTokenSymbol, setBuilderTokenSymbol] = useState('');
+  const [builderSubproxyAccount, setBuilderSubproxyAccount] = useState('');
   const [variablesCommitted, setVariablesCommitted] = useState(false);
 
   useEffect(() => {
     Promise.all([
       fetch('/atlas-2025-11-20.json').then(res => res.json()),
-      fetch('/prysm-agent.json').then(res => res.json())
+      fetch('/prysm-agent.json').then(res => res.json()),
+      fetch('/launch_agent_6_agent.json').then(res => res.json())
     ])
-      .then(([atlasData, prysmData]) => {
+      .then(([atlasData, prysmData, launch6Data]) => {
         const processedData = preprocessData(atlasData);
 
         // Extract all agents for comparison
@@ -86,8 +89,9 @@ export function ComparisonPage() {
         const launch3 = findNodeByDocNo(processedData, 'A.6.1.1.4');
         const launch4 = findNodeByDocNo(processedData, 'A.6.1.1.5');
 
-        // Preprocess Prysm data
+        // Preprocess Prysm and Launch Agent 6 data
         preprocessNode(prysmData);
+        preprocessNode(launch6Data);
 
         const agents = [];
         if (spark) agents.push({ name: 'Spark', node: spark });
@@ -96,6 +100,7 @@ export function ComparisonPage() {
         if (launch3) agents.push({ name: 'Launch Agent 3', node: launch3 });
         if (launch4) agents.push({ name: 'Launch Agent 4', node: launch4 });
         agents.push({ name: 'Prysm', node: prysmData });
+        agents.push({ name: 'Launch Agent 6', node: launch6Data });
 
         setComparisonAgents(agents);
         setLoading(false);
@@ -165,7 +170,7 @@ export function ComparisonPage() {
         <Text c="dimmed" size="sm">Compare agent structures and build custom agents</Text>
       </Box>
 
-      {comparisonAgents.length === 6 && (
+      {comparisonAgents.length === 7 && (
         <>
           <Box mb="md">
             <Group justify="center" mb="sm">
@@ -215,8 +220,10 @@ export function ComparisonPage() {
             showBuilder={visibleAgents['Builder']}
             builderAgentName={builderAgentName}
             builderTokenSymbol={builderTokenSymbol}
+            builderSubproxyAccount={builderSubproxyAccount}
             onBuilderAgentNameChange={setBuilderAgentName}
             onBuilderTokenSymbolChange={setBuilderTokenSymbol}
+            onBuilderSubproxyAccountChange={setBuilderSubproxyAccount}
             variablesCommitted={variablesCommitted}
             onVariablesCommit={() => setVariablesCommitted(true)}
             onVariablesEdit={() => setVariablesCommitted(false)}
