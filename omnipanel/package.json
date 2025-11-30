@@ -1,0 +1,38 @@
+{
+  "name": "react-three-plane-template",
+  "version": "1.0.0",
+  "description": "A responsive React Three Fiber template with golden ratio plane and HUD system",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@mantine/core": "^8.2.4",
+    "@mantine/hooks": "^8.2.4",
+    "@react-three/drei": "^9.92.0",
+    "@react-three/fiber": "^8.15.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-markdown": "^10.1.0",
+    "react-router-dom": "^7.7.1",
+    "three": "^0.160.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "@vitejs/plugin-react": "^4.2.0",
+    "vite": "^5.0.0"
+  },
+  "keywords": [
+    "react",
+    "three.js",
+    "r3f",
+    "template",
+    "responsive",
+    "golden-ratio"
+  ],
+  "author": "",
+  "license": "MIT"
+}

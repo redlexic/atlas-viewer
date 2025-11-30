@@ -10,6 +10,10 @@ import {
   Button,
   TextInput,
   Stack,
+  Textarea,
+  Modal,
+  CopyButton,
+  Tooltip,
 } from '@mantine/core';
 import {
   IconChevronRight,
@@ -19,6 +23,8 @@ import {
   IconEdit,
   IconCheck,
   IconX,
+  IconCode,
+  IconCopy,
 } from '@tabler/icons-react';
 import ReactMarkdown from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
@@ -40,6 +46,8 @@ interface AgentComparisonAlignedProps {
   variablesCommitted: boolean;
   onVariablesCommit: () => void;
   onVariablesEdit: () => void;
+  customEdits: Record<string, { name?: string; content?: string }>;
+  onCustomEditsChange: (edits: Record<string, { name?: string; content?: string }>) => void;
 }
 
 // Rainbow colors for doc_no segments
@@ -249,6 +257,8 @@ const AlignedNodeRow = memo(
     builderAgentName,
     builderTokenSymbol,
     builderSubproxyAccount,
+    customEdits,
+    onCustomEditsChange,
   }: {
     nodes: (AtlasNode | null)[];
     level: number;
@@ -264,7 +274,18 @@ const AlignedNodeRow = memo(
     builderAgentName: string;
     builderTokenSymbol: string;
     builderSubproxyAccount: string;
+    customEdits: Record<string, { name?: string; content?: string }>;
+    onCustomEditsChange: (edits: Record<string, { name?: string; content?: string }>) => void;
   }) => {
+    // Edit mode state for this row's Builder section
+    const [isEditing, setIsEditing] = useState(false);
+    const [editedName, setEditedName] = useState('');
+    const [editedContent, setEditedContent] = useState('');
+
+    // Markdown view modal state
+    const [markdownViewOpen, setMarkdownViewOpen] = useState(false);
+    const [markdownViewContent, setMarkdownViewContent] = useState({ name: '', content: '' });
+
     // Build unified structure for children
     const childSections = buildUnifiedStructure(nodes);
 
@@ -353,8 +374,34 @@ const AlignedNodeRow = memo(
                       ? '3px solid var(--mantine-color-green-6)'
                       : '3px solid var(--mantine-color-blue-6)',
                     overflow: 'hidden',
+                    position: 'relative',
                   }}
                 >
+                  {/* Markdown view icon */}
+                  <Tooltip label="View raw markdown">
+                    <ActionIcon
+                      size="xs"
+                      variant="subtle"
+                      color="gray"
+                      style={{
+                        position: 'absolute',
+                        top: 4,
+                        right: 4,
+                        zIndex: 1,
+                      }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setMarkdownViewContent({
+                          name: node.name || '',
+                          content: node.content || '',
+                        });
+                        setMarkdownViewOpen(true);
+                      }}
+                    >
+                      <IconCode size={12} />
+                    </ActionIcon>
+                  </Tooltip>
+
                   <Group gap="xs" mb={4} wrap="wrap">
                     <Radio
                       size="xs"
@@ -396,6 +443,7 @@ const AlignedNodeRow = memo(
                       style={{ overflow: 'hidden' }}
                     >
                       <Text
+                        component="div"
                         size="xs"
                         style={{
                           fontSize: '0.7rem',
@@ -420,20 +468,25 @@ const AlignedNodeRow = memo(
                   p="xs"
                   mb="xs"
                   withBorder
-                  title="Click to remove from Builder"
+                  title={isEditing ? '' : 'Click to remove from Builder'}
                   style={{
                     marginLeft: level * 12,
                     borderLeft: '3px solid var(--mantine-color-green-6)',
                     overflow: 'hidden',
-                    cursor: 'pointer',
+                    cursor: isEditing ? 'default' : 'pointer',
                     position: 'relative',
                   }}
-                  onClick={() => {
-                    // Remove this section from selectedSections by creating new object without this key
-                    const { [docNoSuffix]: _, ...newSections } =
-                      selectedSections;
-                    onSectionSelect(newSections);
-                  }}
+                  onClick={
+                    isEditing
+                      ? undefined
+                      : () => {
+                          // Remove this section from selectedSections by creating new object without this key
+                          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                          const { [docNoSuffix]: _, ...newSections } =
+                            selectedSections;
+                          onSectionSelect(newSections);
+                        }
+                  }
                 >
                   {(() => {
                     const selectedNode = selectedSections[docNoSuffix].node;
@@ -459,7 +512,8 @@ const AlignedNodeRow = memo(
                     const builderChildCount =
                       countSelectedChildren(selectedNode);
 
-                    // Apply variable substitution
+                    // Get custom edit or apply variable substitution
+                    const customEdit = customEdits[docNoSuffix];
                     const substitutedName = substituteVariables(
                       selectedNode.name,
                       builderAgentName,
@@ -475,64 +529,168 @@ const AlignedNodeRow = memo(
                         )
                       : '';
 
+                    // Display name and content (use custom edit if exists, otherwise substituted)
+                    const displayName = customEdit?.name !== undefined ? customEdit.name : substitutedName;
+                    const displayContent = customEdit?.content !== undefined ? customEdit.content : substitutedContent;
+
+                    // Strip HTML from substituted text for plain text editing
+                    const stripHtml = (html: string) => html.replace(/<[^>]*>/g, '');
+
                     return (
                       <>
-                        {/* Remove button indicator */}
-                        <ActionIcon
-                          size="xs"
-                          variant="subtle"
-                          color="red"
-                          style={{
-                            position: 'absolute',
-                            top: 4,
-                            right: 4,
-                            zIndex: 1,
-                            pointerEvents: 'none', // Let clicks pass through to Paper
-                          }}
-                        >
-                          <IconX size={12} />
-                        </ActionIcon>
-
-                        <Group gap="xs" mb={4} wrap="wrap">
-                          <Text size="xs" fw={700}>
-                            <ColoredDocNo docNo={selectedNode.doc_no} />
-                          </Text>
-                          <Badge size="xs" variant="light" color="green">
-                            {selectedNode.type}
-                          </Badge>
-                          {builderChildCount > 0 && (
-                            <Badge size="xs" variant="filled" color="gray">
-                              {builderChildCount}
-                            </Badge>
-                          )}
-                        </Group>
-                        <Text
-                          size="xs"
-                          fw={500}
-                          mb={substitutedContent ? 4 : 0}
-                          style={{ wordBreak: 'break-word' }}
-                          dangerouslySetInnerHTML={{ __html: substitutedName }}
-                        />
-                        {substitutedContent && (
-                          <Paper
-                            p="xs"
-                            bg="dark.8"
-                            mt="xs"
-                            style={{ overflow: 'hidden' }}
-                          >
-                            <Text
+                        {/* Remove/Edit buttons */}
+                        {!isEditing && (
+                          <>
+                            <ActionIcon
                               size="xs"
+                              variant="subtle"
+                              color="blue"
                               style={{
-                                fontSize: '0.7rem',
-                                wordBreak: 'break-word',
-                                overflowWrap: 'break-word',
+                                position: 'absolute',
+                                top: 4,
+                                right: 24,
+                                zIndex: 1,
+                              }}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                // Initialize edit fields with current display values (stripped of HTML)
+                                setEditedName(customEdit?.name !== undefined ? customEdit.name : stripHtml(substitutedName));
+                                setEditedContent(customEdit?.content !== undefined ? customEdit.content : stripHtml(substitutedContent));
+                                setIsEditing(true);
+                              }}
+                              title="Edit this section"
+                            >
+                              <IconEdit size={12} />
+                            </ActionIcon>
+                            <ActionIcon
+                              size="xs"
+                              variant="subtle"
+                              color="red"
+                              style={{
+                                position: 'absolute',
+                                top: 4,
+                                right: 4,
+                                zIndex: 1,
+                                pointerEvents: 'none', // Let clicks pass through to Paper
                               }}
                             >
-                              <ReactMarkdown rehypePlugins={[rehypeRaw]}>
-                                {substitutedContent}
-                              </ReactMarkdown>
-                            </Text>
-                          </Paper>
+                              <IconX size={12} />
+                            </ActionIcon>
+                          </>
+                        )}
+
+                        {isEditing ? (
+                          // Edit mode
+                          <Stack gap="xs" onClick={(e) => e.stopPropagation()}>
+                            <Group gap="xs" mb={4} wrap="wrap">
+                              <Text size="xs" fw={700}>
+                                <ColoredDocNo docNo={selectedNode.doc_no} />
+                              </Text>
+                              <Badge size="xs" variant="light" color="green">
+                                {selectedNode.type}
+                              </Badge>
+                            </Group>
+                            <TextInput
+                              label="Name"
+                              value={editedName}
+                              onChange={(e) => setEditedName(e.currentTarget.value)}
+                              size="xs"
+                            />
+                            <Textarea
+                              label="Content"
+                              value={editedContent}
+                              onChange={(e) => setEditedContent(e.currentTarget.value)}
+                              minRows={4}
+                              maxRows={12}
+                              autosize
+                              size="xs"
+                            />
+                            <Group gap="xs">
+                              <Button
+                                size="xs"
+                                color="green"
+                                leftSection={<IconCheck size={14} />}
+                                onClick={() => {
+                                  // Save edits
+                                  onCustomEditsChange({
+                                    ...customEdits,
+                                    [docNoSuffix]: {
+                                      name: editedName,
+                                      content: editedContent,
+                                    },
+                                  });
+                                  setIsEditing(false);
+                                }}
+                              >
+                                Save
+                              </Button>
+                              <Button
+                                size="xs"
+                                variant="light"
+                                color="gray"
+                                onClick={() => {
+                                  setIsEditing(false);
+                                }}
+                              >
+                                Cancel
+                              </Button>
+                            </Group>
+                          </Stack>
+                        ) : (
+                          // Display mode
+                          <>
+                            <Group gap="xs" mb={4} wrap="wrap">
+                              <Text size="xs" fw={700}>
+                                <ColoredDocNo docNo={selectedNode.doc_no} />
+                              </Text>
+                              <Badge size="xs" variant="light" color="green">
+                                {selectedNode.type}
+                              </Badge>
+                              {builderChildCount > 0 && (
+                                <Badge size="xs" variant="filled" color="gray">
+                                  {builderChildCount}
+                                </Badge>
+                              )}
+                              {customEdit && (
+                                <Badge size="xs" variant="filled" color="blue">
+                                  Edited
+                                </Badge>
+                              )}
+                            </Group>
+                            <Text
+                              size="xs"
+                              fw={500}
+                              mb={displayContent ? 4 : 0}
+                              style={{ wordBreak: 'break-word' }}
+                              dangerouslySetInnerHTML={{ __html: displayName }}
+                            />
+                            {displayContent && (
+                              <Paper
+                                p="xs"
+                                bg="dark.8"
+                                mt="xs"
+                                style={{ overflow: 'hidden' }}
+                              >
+                                <Text
+                                  component="div"
+                                  size="xs"
+                                  style={{
+                                    fontSize: '0.7rem',
+                                    wordBreak: 'break-word',
+                                    overflowWrap: 'break-word',
+                                  }}
+                                >
+                                  {customEdit ? (
+                                    <ReactMarkdown>{displayContent}</ReactMarkdown>
+                                  ) : (
+                                    <ReactMarkdown rehypePlugins={[rehypeRaw]}>
+                                      {displayContent}
+                                    </ReactMarkdown>
+                                  )}
+                                </Text>
+                              </Paper>
+                            )}
+                          </>
                         )}
                       </>
                     );
@@ -564,32 +722,124 @@ const AlignedNodeRow = memo(
           <Box
             style={{
               gridColumn: '1 / -1',
-              borderBottom: '2px dotted var(--mantine-color-gray-6)',
+              borderBottom: '1px dotted var(--mantine-color-gray-5)',
               marginTop: '4px',
               marginBottom: '8px',
+              opacity: 0.5,
             }}
           />
         )}
 
         {/* Render children recursively if expanded */}
-        {isExpanded &&
-          childSections.map((section, index) => (
-            <AlignedNodeRow
-              key={`${section.name}-${index}`}
-              nodes={section.nodes}
-              level={level + 1}
-              agentNames={agentNames}
-              expandedNodes={expandedNodes}
-              onToggle={onToggle}
-              docNoSuffix={section.name}
-              selectedSections={selectedSections}
-              onSectionSelect={onSectionSelect}
-              showBuilder={showBuilder}
-              builderAgentName={builderAgentName}
-              builderTokenSymbol={builderTokenSymbol}
-              builderSubproxyAccount={builderSubproxyAccount}
-            />
-          ))}
+        {isExpanded && (
+          <>
+            {childSections.map((section, index) => (
+              <AlignedNodeRow
+                key={`${section.name}-${index}`}
+                nodes={section.nodes}
+                level={level + 1}
+                agentNames={agentNames}
+                expandedNodes={expandedNodes}
+                onToggle={onToggle}
+                docNoSuffix={section.name}
+                selectedSections={selectedSections}
+                onSectionSelect={onSectionSelect}
+                showBuilder={showBuilder}
+                builderAgentName={builderAgentName}
+                builderTokenSymbol={builderTokenSymbol}
+                builderSubproxyAccount={builderSubproxyAccount}
+                customEdits={customEdits}
+                onCustomEditsChange={onCustomEditsChange}
+              />
+            ))}
+            {/* Solid line after all children at this level */}
+            {childSections.length > 0 && (
+              <Box
+                style={{
+                  gridColumn: '1 / -1',
+                  borderBottom: '2px solid var(--mantine-color-gray-7)',
+                  marginTop: '8px',
+                  marginBottom: '12px',
+                  opacity: 0.4,
+                }}
+              />
+            )}
+          </>
+        )}
+
+        {/* Markdown view modal */}
+        <Modal
+          opened={markdownViewOpen}
+          onClose={() => setMarkdownViewOpen(false)}
+          title="Raw Markdown"
+          size="lg"
+        >
+          <Stack gap="md">
+            <Box>
+              <Group justify="space-between" mb="xs">
+                <Text size="sm" fw={600}>Name</Text>
+                <CopyButton value={markdownViewContent.name}>
+                  {({ copied, copy }) => (
+                    <Button
+                      size="xs"
+                      variant="light"
+                      leftSection={<IconCopy size={14} />}
+                      color={copied ? 'green' : 'blue'}
+                      onClick={copy}
+                    >
+                      {copied ? 'Copied!' : 'Copy Name'}
+                    </Button>
+                  )}
+                </CopyButton>
+              </Group>
+              <Textarea
+                value={markdownViewContent.name}
+                readOnly
+                autosize
+                minRows={1}
+                maxRows={3}
+                styles={{
+                  input: {
+                    fontFamily: 'monospace',
+                    fontSize: '0.85rem',
+                  },
+                }}
+              />
+            </Box>
+
+            <Box>
+              <Group justify="space-between" mb="xs">
+                <Text size="sm" fw={600}>Content</Text>
+                <CopyButton value={markdownViewContent.content}>
+                  {({ copied, copy }) => (
+                    <Button
+                      size="xs"
+                      variant="light"
+                      leftSection={<IconCopy size={14} />}
+                      color={copied ? 'green' : 'blue'}
+                      onClick={copy}
+                    >
+                      {copied ? 'Copied!' : 'Copy Content'}
+                    </Button>
+                  )}
+                </CopyButton>
+              </Group>
+              <Textarea
+                value={markdownViewContent.content}
+                readOnly
+                autosize
+                minRows={5}
+                maxRows={20}
+                styles={{
+                  input: {
+                    fontFamily: 'monospace',
+                    fontSize: '0.85rem',
+                  },
+                }}
+              />
+            </Box>
+          </Stack>
+        </Modal>
       </>
     );
   }
@@ -609,6 +859,8 @@ export const AgentComparisonAligned = ({
   variablesCommitted,
   onVariablesCommit,
   onVariablesEdit,
+  customEdits,
+  onCustomEditsChange,
 }: AgentComparisonAlignedProps) => {
   const agentNames = agents.map((a) => a.name);
   const rootNodes = agents.map((a) => a.node);
@@ -821,6 +1073,8 @@ export const AgentComparisonAligned = ({
         builderAgentName={builderAgentName}
         builderTokenSymbol={builderTokenSymbol}
         builderSubproxyAccount={builderSubproxyAccount}
+        customEdits={customEdits}
+        onCustomEditsChange={onCustomEditsChange}
       />
     </Box>
   );
