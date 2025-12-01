@@ -3,12 +3,14 @@ import ReactMarkdown from 'react-markdown'
 import { SceneContext } from '../context/SceneContext'
 import { getNodeColor } from '../data/sampleAtlasNodes'
 import { getParentDocNo } from '../utils/treeParser'
+import { buildTree } from '../utils/treeParser'
+import { getTreeStats } from '../data/agentDataLoader'
 
 /**
  * Sidebar that displays full node details when a node is selected
  */
 export function NodeDetailSidebar() {
-  const { selectedTile, selectTile, treeNodes } = useContext(SceneContext)
+  const { selectedTile, selectTile, treeNodes, treeDataSource, navigationIndex, navigationTotal } = useContext(SceneContext)
 
   if (!selectedTile) {
     return null
@@ -36,6 +38,22 @@ export function NodeDetailSidebar() {
   const getArrayCount = (field) => {
     return Array.isArray(node[field]) ? node[field].length : 0
   }
+
+  // Calculate node depth from doc_no
+  const getDepth = () => {
+    if (!node.doc_no) return 0
+    // Count dots and add 1 (e.g., "A" = 1, "A.1" = 2, "A.1.2" = 3)
+    return node.doc_no.split('.').length
+  }
+
+  // Calculate tree stats
+  const stats = useMemo(() => {
+    if (!treeNodes || treeNodes.length === 0) {
+      return null
+    }
+    const tree = buildTree(treeNodes)
+    return getTreeStats(tree[0] || treeNodes)
+  }, [treeNodes])
 
   const handleClose = () => {
     selectTile(null)
@@ -66,33 +84,10 @@ export function NodeDetailSidebar() {
         <div className="sidebar-content">
           {/* Metadata Section */}
           <div className="metadata-section">
-            {parentNode && (
-              <div className="metadata-item">
-                <span className="metadata-label">Parent:</span>
-                <span className="metadata-value">
-                  {parentNode.doc_no} - {parentNode.name}
-                </span>
-              </div>
-            )}
-
             {node.last_modified && (
               <div className="metadata-item">
                 <span className="metadata-label">Last Modified:</span>
                 <span className="metadata-value">{node.last_modified || 'N/A'}</span>
-              </div>
-            )}
-
-            {/* Show counts for array fields if they exist */}
-            {(getArrayCount('agent_scope_database') > 0 ||
-              getArrayCount('annotations') > 0 ||
-              getArrayCount('tenets') > 0 ||
-              getArrayCount('active_data') > 0 ||
-              getArrayCount('needed_research') > 0) && (
-              <div className="metadata-item">
-                <span className="metadata-label">Children:</span>
-                <span className="metadata-value">
-                  {getArrayCount('agent_scope_database')} nodes
-                </span>
               </div>
             )}
 
@@ -134,6 +129,46 @@ export function NodeDetailSidebar() {
               </div>
             </div>
           )}
+        </div>
+
+        {/* Data Source Panel at bottom */}
+        <div className="stats-panel">
+          <div className="stats-grid">
+            <div className="stat-item">
+              <span className="stat-label">Data Source:</span>
+              <span className="stat-value">{treeDataSource}</span>
+            </div>
+            <div className="stat-item">
+              <span className="stat-label">Total Nodes:</span>
+              <span className="stat-value">{stats?.totalNodes || 0}</span>
+            </div>
+            <div className="stat-item">
+              <span className="stat-label">Max Depth:</span>
+              <span className="stat-value">{stats?.maxDepth || 0}</span>
+            </div>
+            {navigationIndex >= 0 && navigationTotal > 0 && (
+              <div className="stat-item">
+                <span className="stat-label">Position:</span>
+                <span className="stat-value highlight">
+                  {navigationIndex + 1} / {navigationTotal}
+                </span>
+              </div>
+            )}
+            {parentNode && (
+              <div className="stat-item">
+                <span className="stat-label">Parent:</span>
+                <span className="stat-value">{parentNode.doc_no}</span>
+              </div>
+            )}
+            <div className="stat-item">
+              <span className="stat-label">Depth:</span>
+              <span className="stat-value">{getDepth()}</span>
+            </div>
+            <div className="stat-item">
+              <span className="stat-label">Children:</span>
+              <span className="stat-value">{getArrayCount('agent_scope_database')}</span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -379,6 +414,45 @@ export function NodeDetailSidebar() {
         .markdown-content a:hover {
           color: #93c5fd;
           border-bottom-color: rgba(147, 197, 253, 0.6);
+        }
+
+        .stats-panel {
+          background: rgba(0, 0, 0, 0.4);
+          border-top: 2px solid rgba(59, 130, 246, 0.3);
+          padding: 16px;
+        }
+
+        .stats-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 12px 16px;
+        }
+
+        .stats-grid .stat-item {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+        }
+
+        .stats-grid .stat-label {
+          color: #9ca3af;
+          font-size: 11px;
+          font-weight: 500;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+
+        .stats-grid .stat-value {
+          color: #60a5fa;
+          font-size: 13px;
+          font-weight: 600;
+          font-family: 'Monaco', 'Menlo', monospace;
+        }
+
+        .stats-grid .stat-value.highlight {
+          color: #93c5fd;
+          font-size: 14px;
+          font-weight: 700;
         }
 
         @media (max-width: 768px) {

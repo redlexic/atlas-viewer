@@ -12,8 +12,14 @@ export function TreeStatsHUD() {
     treeLoading: isLoading,
     treeDataSource: dataSource,
     navigationIndex,
-    navigationTotal
+    navigationTotal,
+    selectedTile
   } = useContext(SceneContext)
+
+  // Hide when sidebar is open
+  if (selectedTile) {
+    return null
+  }
   const stats = useMemo(() => {
     if (!nodes || nodes.length === 0) {
       return null
@@ -85,8 +91,8 @@ export function TreeStatsHUD() {
       <style>{`
         .stats-hud {
           position: fixed;
-          top: 20px;
-          right: 20px;
+          bottom: 20px;
+          left: 20px;
           background: rgba(17, 24, 39, 0.9);
           border: 1px solid rgba(59, 130, 246, 0.5);
           border-radius: 8px;

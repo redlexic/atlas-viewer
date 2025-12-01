@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useContext } from 'react'
 import { SceneContext } from '../context/SceneContext'
-import { buildTree, flattenTree } from '../utils/treeParser'
 
 /**
  * Keyboard navigation for tree nodes
@@ -23,17 +22,12 @@ import { buildTree, flattenTree } from '../utils/treeParser'
 export function useKeyboardNavigation(nodes) {
   const { selectedTile, selectTile, updateNavigationState } = useContext(SceneContext)
 
-  // Flatten tree into depth-first traversal order
+  // Use nodes directly (they're already in tree order)
   const flattenedNodes = useMemo(() => {
     if (!nodes || nodes.length === 0) return []
 
-    // Build tree structure
-    const tree = buildTree(nodes)
-
-    // Flatten to depth-first order
-    const flat = flattenTree(tree)
-
-    return flat
+    // Nodes are already processed and aligned, just use them directly
+    return nodes
   }, [nodes])
 
   // Find index of currently selected node
@@ -104,9 +98,6 @@ export function useKeyboardNavigation(nodes) {
       // Select the new node
       if (newIndex !== -1 && flattenedNodes[newIndex]) {
         const node = flattenedNodes[newIndex]
-
-        // Add x, y coordinates if available from layout
-        // The parent component should have this info
         selectTile(node)
       }
     }

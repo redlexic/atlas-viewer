@@ -18,6 +18,7 @@ export function SceneProvider({ children }) {
   const [treeBounds, setTreeBounds] = useState(null)
   const [navigationIndex, setNavigationIndex] = useState(-1)
   const [navigationTotal, setNavigationTotal] = useState(0)
+  const [layoutAlgorithm, setLayoutAlgorithm] = useState('reingold-tilford') // 'walker' or 'reingold-tilford'
   
   // HUD actions that affect the 3D scene
   const actions = {
@@ -60,9 +61,13 @@ export function SceneProvider({ children }) {
       setNavigationIndex(index)
       setNavigationTotal(total)
     }, []),
-    
+
     toggleCameraType: useCallback(() => {
       setIsOrthographic(prev => !prev)
+    }, []),
+
+    setLayoutAlgorithm: useCallback((algorithm) => {
+      setLayoutAlgorithm(algorithm)
     }, []),
     
     resetPlane: useCallback(() => {
@@ -89,6 +94,7 @@ export function SceneProvider({ children }) {
     treeBounds,
     navigationIndex,
     navigationTotal,
+    layoutAlgorithm,
     // Actions
     ...actions
   }

@@ -52,9 +52,9 @@ export const TREE_CONFIG = {
    * - Affects: Overall tree width and node density
    * - Increase: Nodes spread further apart horizontally (wider tree)
    * - Decrease: Nodes closer together (more compact tree)
-   * - Current: Using golden ratio (1.618) for aesthetic balance
+   * - Current: Increased to accommodate side-by-side multi-agent tiles (up to 3 agents)
    */
-  horizontalSpacing: 1.618 / 2,
+  horizontalSpacing: 1.618 * 1.5,
 
   /**
    * Vertical spacing between parent and child levels (rows)
@@ -63,7 +63,7 @@ export const TREE_CONFIG = {
    * - Decrease: Levels closer together (more compact vertically)
    * - Units: Same as world coordinates
    */
-  verticalSpacing: 1.618,
+  verticalSpacing: 3.5,
 
   /**
    * Size of each tile/node (square dimensions)

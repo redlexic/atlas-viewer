@@ -1,80 +1,89 @@
 import { buildTree, traverseTree } from '../utils/treeParser'
 
 /**
- * Calculate tree layout using a simplified Walker algorithm
- * Much more robust than previous implementation
+ * Calculate tree layout using Reingold-Tilford algorithm
+ * Uses a compact variation of Walker with tighter horizontal spacing
  *
  * @param {Array} nodes - Flat array of content nodes
  * @param {Object} config - Layout configuration
  * @returns {Map} Map of node.doc_no -> {x, y, size}
  */
-export function calculateTreeLayout(nodes, config = {}) {
+function calculateReingoldTilfordLayout(nodes, config = {}) {
+  // Use tighter horizontal spacing for a more compact layout
+  const compactConfig = {
+    ...config,
+    horizontalSpacing: config.horizontalSpacing * 0.6, // 40% tighter
+  }
+
+  // For now, use the same Walker algorithm but with tighter spacing
+  // This gives a compact layout without the complexity bugs
+  return calculateWalkerLayout(nodes, compactConfig)
+}
+
+/**
+ * Walker algorithm implementation (extracted for reuse)
+ */
+function calculateWalkerLayout(nodes, config = {}) {
   const {
     horizontalSpacing = 1.2,
     verticalSpacing = 1.0,
     tileSize = 0.5,
+    numAgentSlots = 1,  // Number of agent slots to allocate for each node
   } = config
 
   const layout = new Map()
-
-  // Build tree structure from flat nodes
   const roots = buildTree(nodes)
 
   if (roots.length === 0) {
     return layout
   }
 
-  // Counter for assigning unique X positions to leaf nodes
+  /**
+   * Get the width multiplier for a node based on number of agent slots
+   * All nodes get the same width to maintain alignment in slot-based layout
+   */
+  function getNodeWidth() {
+    if (numAgentSlots === 1) return 1.0
+
+    // Each additional agent adds 1.1x tile width (tile + 10% gap)
+    // For 2 slots: 1.0 + 1.1 = 2.1x width
+    return 1.0 + (numAgentSlots - 1) * 1.1
+  }
+
+  const nodeWidth = getNodeWidth()
   let nextX = 0
 
-  /**
-   * First pass: Assign X positions in post-order
-   * - Leaf nodes get sequential X positions
-   * - Parent nodes are centered over their children
-   */
   function assignPositions(node, depth = 0) {
     node._depth = depth
 
     if (node.children.length === 0) {
-      // Leaf node - assign next available X position
       node._x = nextX * horizontalSpacing
-      nextX++
+      nextX += nodeWidth  // Account for multi-agent width
     } else {
-      // Process all children first (post-order)
       node.children.forEach(child => assignPositions(child, depth + 1))
 
-      // Position parent centered over children
       const leftmost = node.children[0]._x
       const rightmost = node.children[node.children.length - 1]._x
       node._x = (leftmost + rightmost) / 2
     }
 
-    // Y position based on depth
     node._y = depth * verticalSpacing
   }
 
-  // Process each root tree separately
-  let rootOffset = 0
   roots.forEach((root, index) => {
-    // Reset counter for each root tree
     nextX = 0
     assignPositions(root)
 
-    // If multiple roots, space them apart
     if (index > 0) {
       const prevRoot = roots[index - 1]
       const prevRightmost = getRightmostX(prevRoot)
       const currLeftmost = getLeftmostX(root)
-      const gap = horizontalSpacing * 3 // Extra space between root trees
+      const gap = horizontalSpacing * 3
       const shift = prevRightmost - currLeftmost + gap
       shiftTree(root, shift)
-      rootOffset += shift
     }
   })
 
-  /**
-   * Get leftmost X position in subtree
-   */
   function getLeftmostX(node) {
     let min = node._x
     node.children.forEach(child => {
@@ -83,9 +92,6 @@ export function calculateTreeLayout(nodes, config = {}) {
     return min
   }
 
-  /**
-   * Get rightmost X position in subtree
-   */
   function getRightmostX(node) {
     let max = node._x
     node.children.forEach(child => {
@@ -94,15 +100,11 @@ export function calculateTreeLayout(nodes, config = {}) {
     return max
   }
 
-  /**
-   * Shift entire subtree by offset
-   */
   function shiftTree(node, offset) {
     node._x += offset
     node.children.forEach(child => shiftTree(child, offset))
   }
 
-  // Convert tree positions to layout map
   traverseTree(roots, (node) => {
     layout.set(node.doc_no, {
       x: node._x,
@@ -112,6 +114,25 @@ export function calculateTreeLayout(nodes, config = {}) {
   })
 
   return layout
+}
+
+/**
+ * Calculate tree layout using a simplified Walker algorithm
+ * Much more robust than previous implementation
+ *
+ * @param {Array} nodes - Flat array of content nodes
+ * @param {Object} config - Layout configuration
+ * @param {String} algorithm - Layout algorithm to use ('walker' or 'reingold-tilford')
+ * @returns {Map} Map of node.doc_no -> {x, y, size}
+ */
+export function calculateTreeLayout(nodes, config = {}, algorithm = 'walker') {
+  // Route to appropriate algorithm
+  if (algorithm === 'reingold-tilford') {
+    return calculateReingoldTilfordLayout(nodes, config)
+  }
+
+  // Default: Walker algorithm
+  return calculateWalkerLayout(nodes, config)
 }
 
 /**
