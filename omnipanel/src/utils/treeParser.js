@@ -8,12 +8,20 @@
 
 /**
  * Get children from nested agent artifact format
- * Looks for any array field containing nodes (agent_scope_database, etc.)
+ * Looks for any array field containing nodes (agent_scope_database, articles, sections_and_primary_docs, etc.)
  */
 function getChildrenFromNode(node) {
-  // First try agent_scope_database (standard field)
-  if (node.agent_scope_database && Array.isArray(node.agent_scope_database)) {
-    return node.agent_scope_database
+  // Try common field names in order of priority
+  const childFields = [
+    'agent_scope_database',
+    'articles',
+    'sections_and_primary_docs'
+  ]
+
+  for (const fieldName of childFields) {
+    if (node[fieldName] && Array.isArray(node[fieldName]) && node[fieldName].length > 0) {
+      return node[fieldName]
+    }
   }
 
   // Otherwise look for any array field containing nodes
@@ -84,6 +92,30 @@ export function buildTree(nodes) {
   // If nodes is an array with a single nested object, use nested format
   if (Array.isArray(nodes) && nodes.length === 1 && nodes[0].agent_scope_database) {
     return buildTreeFromNested(nodes[0])
+  }
+
+  // If nodes is an array of multiple nested objects (e.g., Full Atlas with 7 scopes)
+  // Check if items have nested structure fields (articles, sections_and_primary_docs, agent_scope_database)
+  // BUT don't process if they already have a children array (means they're already processed)
+  if (Array.isArray(nodes) && nodes.length > 0 && !Array.isArray(nodes[0].children)) {
+    const firstNode = nodes[0]
+    const hasNestedFields = firstNode.articles || firstNode.sections_and_primary_docs || firstNode.agent_scope_database
+
+    if (hasNestedFields) {
+      console.log(`[buildTree] Processing ${nodes.length} nested tree roots`)
+      // Process each root node as a nested tree
+      function processNode(node) {
+        const children = getChildrenFromNode(node)
+        return {
+          ...node,
+          children: children.map(child => processNode(child))
+        }
+      }
+
+      const result = nodes.map(node => processNode(node))
+      console.log(`[buildTree] Processed result:`, result.map(n => ({ doc_no: n.doc_no, children_count: n.children?.length })))
+      return result
+    }
   }
 
   // If nodes already have children property and appears to be a tree structure (not flattened)

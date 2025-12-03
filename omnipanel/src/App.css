@@ -1,14 +1,15 @@
-* {
+/* Scoped styles for hierarchical view - don't affect other pages */
+.hierarchical-view-container {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-}
-
-body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   background: #0f172a;
   color: white;
   overflow: hidden;
+  width: 100vw;
+  height: 100vh;
+  position: relative;
 }
 
 .app {
