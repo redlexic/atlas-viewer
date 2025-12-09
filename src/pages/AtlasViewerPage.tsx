@@ -3,85 +3,14 @@ import { Container, Title, Text, Loader, Center, Box, Group, Button } from '@man
 import { IconFolder, IconFolderOpen } from '@tabler/icons-react';
 import { TreeNode } from '../TreeNode';
 import type { AtlasNode } from '../types';
-
-// Helper to get all children from any array field containing document nodes
-const getChildren = (node: AtlasNode): AtlasNode[] => {
-  const children: AtlasNode[] = [];
-
-  for (const key in node) {
-    const value = node[key];
-    if (Array.isArray(value) && value.length > 0) {
-      // Check if this array contains document nodes (has type, doc_no, name, uuid)
-      if (value[0] && typeof value[0] === 'object' && 'type' in value[0] && 'doc_no' in value[0] && 'uuid' in value[0]) {
-        children.push(...value);
-      }
-    }
-  }
-
-  return children;
-};
-
-// Preprocess data to add child counts
-const preprocessNode = (node: AtlasNode): number => {
-  const children = getChildren(node);
-  let count = children.length;
-
-  children.forEach(child => {
-    count += preprocessNode(child);
-  });
-
-  node.childCount = count;
-  return count;
-};
-
-const preprocessData = (data: AtlasNode[]): AtlasNode[] => {
-  data.forEach(node => preprocessNode(node));
-  return data;
-};
-
-// Flatten tree into ordered list for navigation
-const flattenTree = (nodes: AtlasNode[], expandedNodes: Set<string>): AtlasNode[] => {
-  const result: AtlasNode[] = [];
-
-  const traverse = (node: AtlasNode) => {
-    result.push(node);
-    if (expandedNodes.has(node.uuid)) {
-      const children = getChildren(node);
-      children.forEach(traverse);
-    }
-  };
-
-  nodes.forEach(traverse);
-  return result;
-};
-
-// Find next sibling of a node
-const findNextSibling = (nodes: AtlasNode[], currentUuid: string): AtlasNode | null => {
-  const findInChildren = (children: AtlasNode[]): AtlasNode | null => {
-    const index = children.findIndex(n => n.uuid === currentUuid);
-    if (index !== -1 && index < children.length - 1) {
-      return children[index + 1];
-    }
-    return null;
-  };
-
-  const search = (nodeList: AtlasNode[]): AtlasNode | null => {
-    for (const node of nodeList) {
-      const children = getChildren(node);
-      const sibling = findInChildren(children);
-      if (sibling) return sibling;
-
-      const result = search(children);
-      if (result) return result;
-    }
-    return null;
-  };
-
-  const topLevelSibling = findInChildren(nodes);
-  if (topLevelSibling) return topLevelSibling;
-
-  return search(nodes);
-};
+import {
+  getChildren,
+  getAllDescendantUUIDs,
+  findNodeByUUID,
+  flattenTree,
+  findNextSibling,
+} from '../utils/treeUtils';
+import { loadAtlasData } from '../utils/dataLoader';
 
 export function AtlasViewerPage() {
   const [atlasData, setAtlasData] = useState<AtlasNode[]>([]);
@@ -91,21 +20,19 @@ export function AtlasViewerPage() {
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch('/atlas-2025-11-20.json')
-      .then(res => res.json())
-      .then(data => {
-        const processedData = preprocessData(data);
-        setAtlasData(processedData);
+    loadAtlasData()
+      .then((data) => {
+        setAtlasData(data);
         setLoading(false);
       })
-      .catch(err => {
+      .catch((err) => {
         setError(err.message);
         setLoading(false);
       });
   }, []);
 
   const handleToggle = (uuid: string) => {
-    setExpandedNodes(prev => {
+    setExpandedNodes((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(uuid)) {
         newSet.delete(uuid);
@@ -117,47 +44,23 @@ export function AtlasViewerPage() {
   };
 
   const handleExpandAll = (uuid: string) => {
-    const getAllDescendantUUIDs = (node: AtlasNode): string[] => {
-      const children = getChildren(node);
-      const uuids: string[] = [uuid];
-
-      children.forEach(child => {
-        uuids.push(child.uuid);
-        uuids.push(...getAllDescendantUUIDs(child));
-      });
-
-      return uuids;
-    };
-
-    const findNode = (nodes: AtlasNode[], targetUuid: string): AtlasNode | null => {
-      for (const node of nodes) {
-        if (node.uuid === targetUuid) {
-          return node;
-        }
-        const children = getChildren(node);
-        const found = findNode(children, targetUuid);
-        if (found) return found;
-      }
-      return null;
-    };
-
-    const node = findNode(atlasData, uuid);
+    const node = findNodeByUUID(atlasData, uuid);
     if (node) {
-      const allUuids = getAllDescendantUUIDs(node);
-      setExpandedNodes(prev => {
+      const allUuids = [uuid, ...getAllDescendantUUIDs(node)];
+      setExpandedNodes((prev) => {
         const newSet = new Set(prev);
-        allUuids.forEach(id => newSet.add(id));
+        allUuids.forEach((id) => newSet.add(id));
         return newSet;
       });
     }
   };
 
   const expandAllScopes = () => {
-    const allUuids = atlasData.flatMap(scope => {
+    const allUuids = atlasData.flatMap((scope) => {
       const getAllUuids = (node: AtlasNode): string[] => {
         const children = getChildren(node);
         const uuids: string[] = [node.uuid];
-        children.forEach(child => {
+        children.forEach((child) => {
           uuids.push(...getAllUuids(child));
         });
         return uuids;
@@ -172,69 +75,72 @@ export function AtlasViewerPage() {
   };
 
   // Keyboard navigation
-  const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    if (!selectedNodeId) return;
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      if (!selectedNodeId) return;
 
-    const flatNodes = flattenTree(atlasData, expandedNodes);
-    const currentIndex = flatNodes.findIndex(n => n.uuid === selectedNodeId);
-    if (currentIndex === -1) return;
+      const flatNodes = flattenTree(atlasData, expandedNodes);
+      const currentIndex = flatNodes.findIndex((n) => n.uuid === selectedNodeId);
+      if (currentIndex === -1) return;
 
-    const currentNode = flatNodes[currentIndex];
+      const currentNode = flatNodes[currentIndex];
 
-    switch (e.key) {
-      case 'ArrowRight':
-        // Go to next node
-        e.preventDefault();
-        if (currentIndex < flatNodes.length - 1) {
-          setSelectedNodeId(flatNodes[currentIndex + 1].uuid);
+      switch (e.key) {
+        case 'ArrowRight':
+          // Go to next node
+          e.preventDefault();
+          if (currentIndex < flatNodes.length - 1) {
+            setSelectedNodeId(flatNodes[currentIndex + 1].uuid);
+          }
+          break;
+
+        case 'ArrowLeft':
+          // Go to previous node
+          e.preventDefault();
+          if (currentIndex > 0) {
+            setSelectedNodeId(flatNodes[currentIndex - 1].uuid);
+          }
+          break;
+
+        case 'ArrowDown': {
+          // Close current node and go to next sibling
+          e.preventDefault();
+          if (expandedNodes.has(selectedNodeId)) {
+            setExpandedNodes((prev) => {
+              const newSet = new Set(prev);
+              newSet.delete(selectedNodeId);
+              return newSet;
+            });
+          }
+          const nextSibling = findNextSibling(atlasData, selectedNodeId);
+          if (nextSibling) {
+            setSelectedNodeId(nextSibling.uuid);
+          }
+          break;
         }
-        break;
 
-      case 'ArrowLeft':
-        // Go to previous node
-        e.preventDefault();
-        if (currentIndex > 0) {
-          setSelectedNodeId(flatNodes[currentIndex - 1].uuid);
-        }
-        break;
+        case 'ArrowUp':
+          // Go to previous sibling or parent
+          e.preventDefault();
+          if (currentIndex > 0) {
+            setSelectedNodeId(flatNodes[currentIndex - 1].uuid);
+          }
+          break;
 
-      case 'ArrowDown': {
-        // Close current node and go to next sibling
-        e.preventDefault();
-        if (expandedNodes.has(selectedNodeId)) {
-          setExpandedNodes(prev => {
-            const newSet = new Set(prev);
-            newSet.delete(selectedNodeId);
-            return newSet;
-          });
+        case 'Enter':
+        case ' ': {
+          // Toggle expansion
+          e.preventDefault();
+          const children = getChildren(currentNode);
+          if (children.length > 0) {
+            handleToggle(selectedNodeId);
+          }
+          break;
         }
-        const nextSibling = findNextSibling(atlasData, selectedNodeId);
-        if (nextSibling) {
-          setSelectedNodeId(nextSibling.uuid);
-        }
-        break;
       }
-
-      case 'ArrowUp':
-        // Go to previous sibling or parent
-        e.preventDefault();
-        if (currentIndex > 0) {
-          setSelectedNodeId(flatNodes[currentIndex - 1].uuid);
-        }
-        break;
-
-      case 'Enter':
-      case ' ': {
-        // Toggle expansion
-        e.preventDefault();
-        const children = getChildren(currentNode);
-        if (children.length > 0) {
-          handleToggle(selectedNodeId);
-        }
-        break;
-      }
-    }
-  }, [selectedNodeId, atlasData, expandedNodes]);
+    },
+    [selectedNodeId, atlasData, expandedNodes]
+  );
 
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
@@ -252,7 +158,9 @@ export function AtlasViewerPage() {
   if (error) {
     return (
       <Center h="100vh">
-        <Text c="red" size="lg">Error: {error}</Text>
+        <Text c="red" size="lg">
+          Error: {error}
+        </Text>
       </Center>
     );
   }
@@ -262,26 +170,21 @@ export function AtlasViewerPage() {
       <Box mb="xl">
         <Group justify="apart" align="center">
           <Box>
-            <Title order={1} mb="xs">Atlas Viewer</Title>
-            <Text c="dimmed" size="sm">Browse the Atlas documentation structure</Text>
+            <Title order={1} mb="xs">
+              Atlas Viewer
+            </Title>
+            <Text c="dimmed" size="sm">
+              Browse the Atlas documentation structure
+            </Text>
             <Text c="dimmed" size="xs" mt={4}>
               Keyboard: ← → navigate | ↓ collapse & next sibling | ↑ previous | Enter/Space toggle
             </Text>
           </Box>
           <Group>
-            <Button
-              leftSection={<IconFolderOpen size={16} />}
-              onClick={expandAllScopes}
-              variant="light"
-            >
+            <Button leftSection={<IconFolderOpen size={16} />} onClick={expandAllScopes} variant="light">
               Expand All
             </Button>
-            <Button
-              leftSection={<IconFolder size={16} />}
-              onClick={collapseAll}
-              variant="light"
-              color="gray"
-            >
+            <Button leftSection={<IconFolder size={16} />} onClick={collapseAll} variant="light" color="gray">
               Collapse All
             </Button>
           </Group>
@@ -289,7 +192,7 @@ export function AtlasViewerPage() {
       </Box>
 
       <Box>
-        {atlasData.map(scope => (
+        {atlasData.map((scope) => (
           <TreeNode
             key={scope.uuid}
             node={scope}

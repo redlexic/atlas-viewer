@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react
 import { Container, Box, Group, Button } from '@mantine/core';
 import { AtlasViewerPage } from './pages/AtlasViewerPage';
 import { ComparisonPage } from './pages/ComparisonPage';
+import { HierarchicalViewPage } from './pages/HierarchicalViewPage';
 
 function Navigation() {
   const location = useLocation();
@@ -26,6 +27,14 @@ function Navigation() {
           >
             Agent Comparison
           </Button>
+          <Button
+            component={Link}
+            to="/hierarchical"
+            variant={location.pathname === '/hierarchical' ? 'filled' : 'light'}
+            color={location.pathname === '/hierarchical' ? 'blue' : 'gray'}
+          >
+            Hierarchical View
+          </Button>
         </Group>
       </Container>
     </Box>
@@ -39,6 +48,7 @@ function App() {
       <Routes>
         <Route path="/" element={<AtlasViewerPage />} />
         <Route path="/comparison" element={<ComparisonPage />} />
+        <Route path="/hierarchical" element={<HierarchicalViewPage />} />
       </Routes>
     </Router>
   );

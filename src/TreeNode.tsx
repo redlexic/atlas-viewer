@@ -1,87 +1,20 @@
-import { Box, Group, Text, ActionIcon, Badge, Collapse, Paper } from '@mantine/core';
+import { Box, Group, Text, ActionIcon, Badge, Paper } from '@mantine/core';
 import { IconChevronRight, IconChevronDown, IconChevronsDown } from '@tabler/icons-react';
 import ReactMarkdown from 'react-markdown';
 import { useEffect, useRef } from 'react';
-import type { TreeNodeProps, AtlasNode } from './types';
+import type { TreeNodeProps } from './types';
+import { getChildren } from './utils/treeUtils';
+import { ColoredDocNo, getNodeColor } from './utils/colorUtils';
 
-// Rainbow colors for doc_no segments
-const rainbowColors = [
-  '#DC2626', // red
-  '#EA580C', // orange
-  '#D97706', // amber
-  '#CA8A04', // yellow
-  '#65A30D', // lime
-  '#16A34A', // green
-  '#059669', // emerald
-  '#0D9488', // teal
-  '#0891B2', // cyan
-  '#0284C7', // sky
-  '#2563EB', // blue
-  '#4F46E5', // indigo
-  '#7C3AED', // violet
-  '#9333EA', // purple
-  '#C026D3', // fuchsia
-  '#DB2777', // pink
-];
-
-const getSegmentColor = (index: number) => rainbowColors[index % rainbowColors.length];
-
-const ColoredDocNo = ({ docNo }: { docNo: string }) => {
-  const segments = docNo.split('.');
-  return (
-    <>
-      {segments.map((segment, index) => (
-        <span key={index}>
-          {index > 0 && <span style={{ color: '#666' }}>.</span>}
-          <span style={{ color: getSegmentColor(index) }}>{segment}</span>
-        </span>
-      ))}
-    </>
-  );
-};
-
-const getNodeColor = (type: string) => {
-  const colors: Record<string, string> = {
-    'Scope': 'blue',
-    'Article': 'green',
-    'Section': 'orange',
-    'Core': 'red',
-    'Primary': 'purple',
-    'Template': 'yellow',
-  };
-  return colors[type] || 'gray';
-};
-
-// Helper to get all children from any array field containing document nodes
-const getChildren = (node: AtlasNode): AtlasNode[] => {
-  const children: AtlasNode[] = [];
-
-  for (const key in node) {
-    const value = node[key];
-    if (Array.isArray(value) && value.length > 0) {
-      // Check if this array contains document nodes (has type, doc_no, name, uuid)
-      if (value[0] && typeof value[0] === 'object' && 'type' in value[0] && 'doc_no' in value[0] && 'uuid' in value[0]) {
-        children.push(...value);
-      }
-    }
-  }
-
-  return children;
-};
-
-const getAllDescendantUUIDs = (node: AtlasNode): string[] => {
-  const children = getChildren(node);
-  const uuids: string[] = [];
-
-  children.forEach(child => {
-    uuids.push(child.uuid);
-    uuids.push(...getAllDescendantUUIDs(child));
-  });
-
-  return uuids;
-};
-
-export const TreeNode = ({ node, level, expandedNodes, selectedNodeId, onToggle, onExpandAll, onSelect }: TreeNodeProps) => {
+export const TreeNode = ({
+  node,
+  level,
+  expandedNodes,
+  selectedNodeId,
+  onToggle,
+  onExpandAll,
+  onSelect,
+}: TreeNodeProps) => {
   const children = getChildren(node);
   const hasChildren = children.length > 0;
   const isExpanded = expandedNodes.has(node.uuid);
@@ -118,7 +51,9 @@ export const TreeNode = ({ node, level, expandedNodes, selectedNodeId, onToggle,
           cursor: 'pointer',
           borderLeft: `4px solid var(--mantine-color-${getNodeColor(node.type)}-6)`,
           backgroundColor: isSelected ? 'var(--mantine-color-dark-5)' : undefined,
-          borderColor: isSelected ? `var(--mantine-color-${getNodeColor(node.type)}-4)` : undefined,
+          borderColor: isSelected
+            ? `var(--mantine-color-${getNodeColor(node.type)}-4)`
+            : undefined,
           borderWidth: isSelected ? '2px' : undefined,
           transform: isSelected ? 'scale(1.02)' : undefined,
           transition: 'all 0.2s ease',
