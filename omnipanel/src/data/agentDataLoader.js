@@ -25,27 +25,11 @@ export async function loadAgentData(filename) {
 }
 
 /**
- * Load Launch Agent 6 data
- * @returns {Promise<Object>} - Launch Agent 6 data
- */
-export async function loadLaunchAgent6() {
-  return loadAgentData('launch_agent_6_agent.json')
-}
-
-/**
- * Load Prysm Agent data
- * @returns {Promise<Object>} - Prysm Agent data
- */
-export async function loadPrysm() {
-  return loadAgentData('prysm-agent.json')
-}
-
-/**
- * Load full Atlas data
+ * Load full Atlas data (latest version)
  * @returns {Promise<Array>} - Full Atlas data
  */
 export async function loadAtlas() {
-  return loadAgentData('atlas-2025-11-20.json')
+  return loadAgentData('atlas-2025-12-11.json')
 }
 
 /**
@@ -138,45 +122,77 @@ export async function loadLaunchAgent3() {
 }
 
 /**
- * Load Launch Agent 4 data (extract from Full Atlas)
- * @returns {Promise<Array>} - Launch Agent 4 subtree
+ * Load Obex Agent data (extract from Full Atlas)
+ * @returns {Promise<Array>} - Obex Agent subtree
  */
-export async function loadLaunchAgent4() {
+export async function loadObexAgent() {
   const atlas = await loadAtlas()
   const agent = findNodeByDocNo(atlas, 'A.6.1.1.5')
 
   if (!agent) {
-    throw new Error('Launch Agent 4 (A.6.1.1.5) not found in Atlas data')
+    throw new Error('Obex Agent (A.6.1.1.5) not found in Atlas data')
   }
 
   return [agent]
 }
 
 /**
- * Load Launch Agent 6 (old version) data
- * @returns {Promise<Array>} - Launch Agent 6 (old) data
+ * Load Launch Agent 5 data (extract from Full Atlas)
+ * @returns {Promise<Array>} - Launch Agent 5 subtree
  */
-export async function loadLaunchAgent6Old() {
-  const response = await fetch('/launch_agent_6_agent_old.json')
-  if (!response.ok) {
-    throw new Error('Failed to load Launch Agent 6 (old) data')
+export async function loadLaunchAgent5() {
+  const atlas = await loadAtlas()
+  const agent = findNodeByDocNo(atlas, 'A.6.1.1.6')
+
+  if (!agent) {
+    throw new Error('Launch Agent 5 (A.6.1.1.6) not found in Atlas data')
   }
-  const data = await response.json()
-  return [data]
+
+  return [agent]
 }
 
 /**
- * Available datasets (matching Agent Comparison order)
+ * Load a specific Atlas scope by doc_no
+ * @param {string} scopeDocNo - The scope doc_no (e.g., 'A.0', 'A.1')
+ * @returns {Promise<Array>} - Scope data as array with single root
+ */
+async function loadScope(scopeDocNo) {
+  const atlas = await loadAtlas()
+  const scope = atlas.find(node => node.doc_no === scopeDocNo)
+  if (!scope) {
+    throw new Error(`Scope ${scopeDocNo} not found in Atlas`)
+  }
+  return [scope]
+}
+
+// Scope loader factories
+export const loadScopeA0 = () => loadScope('A.0')
+export const loadScopeA1 = () => loadScope('A.1')
+export const loadScopeA2 = () => loadScope('A.2')
+export const loadScopeA3 = () => loadScope('A.3')
+export const loadScopeA4 = () => loadScope('A.4')
+export const loadScopeA5 = () => loadScope('A.5')
+export const loadScopeA6 = () => loadScope('A.6')
+
+/**
+ * Available datasets
  */
 export const DATASETS = {
+  // Atlas Scopes (A.0 through A.6) - only one viewable at a time
+  SCOPE_A0: { id: 'scope_a0', name: 'A.0 Preamble', loader: loadScopeA0, isScope: true },
+  SCOPE_A1: { id: 'scope_a1', name: 'A.1 Governance', loader: loadScopeA1, isScope: true },
+  SCOPE_A2: { id: 'scope_a2', name: 'A.2 Support', loader: loadScopeA2, isScope: true },
+  SCOPE_A3: { id: 'scope_a3', name: 'A.3 Stability', loader: loadScopeA3, isScope: true },
+  SCOPE_A4: { id: 'scope_a4', name: 'A.4 Protocol', loader: loadScopeA4, isScope: true },
+  SCOPE_A5: { id: 'scope_a5', name: 'A.5 Accessibility', loader: loadScopeA5, isScope: true },
+  SCOPE_A6: { id: 'scope_a6', name: 'A.6 Agent', loader: loadScopeA6, isScope: true },
+  // Individual agents (can be combined for comparison)
   SPARK: { id: 'spark', name: 'Spark', loader: loadSparkAgent },
   GROVE: { id: 'grove', name: 'Grove', loader: loadGroveAgent },
   KEEL: { id: 'keel', name: 'Keel', loader: loadKeelAgent },
   LAUNCH_AGENT_3: { id: 'launch_agent_3', name: 'Launch Agent 3', loader: loadLaunchAgent3 },
-  LAUNCH_AGENT_4: { id: 'launch_agent_4', name: 'Launch Agent 4', loader: loadLaunchAgent4 },
-  PRYSM: { id: 'prysm', name: 'Prysm', loader: loadPrysm },
-  LAUNCH_AGENT_6: { id: 'launch_agent_6', name: 'Launch Agent 6', loader: loadLaunchAgent6 },
-  LA6_OLD: { id: 'la6_old', name: 'LA6_old', loader: loadLaunchAgent6Old },
+  OBEX: { id: 'obex', name: 'Obex', loader: loadObexAgent },
+  LAUNCH_AGENT_5: { id: 'launch_agent_5', name: 'Launch Agent 5', loader: loadLaunchAgent5 },
 }
 
 /**

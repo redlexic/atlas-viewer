@@ -17,7 +17,14 @@ export function NodeDetailSidebar() {
   }
 
   const node = selectedTile
-  const typeColor = getNodeColor(node.type)
+  // Get the actual agent node if available (has original doc_no and content)
+  const agentNode = node.agents?.[0]?.node || node
+  // Use originalDocNo for display, falling back to agent's doc_no
+  const displayDocNo = node.originalDocNo || agentNode.doc_no || node.doc_no
+  const displayName = agentNode.name || node.name
+  const displayContent = agentNode.content || node.content
+  const displayType = agentNode.type || node.type
+  const typeColor = getNodeColor(displayType)
 
   // Find parent node
   const parentNode = useMemo(() => {
@@ -34,16 +41,18 @@ export function NodeDetailSidebar() {
     return treeNodes.find(n => n.doc_no === parentDocNo)
   }, [node.doc_no, treeNodes])
 
-  // Helper to get count of array fields
+  // Helper to get count of array fields (check agentNode first, then node)
   const getArrayCount = (field) => {
-    return Array.isArray(node[field]) ? node[field].length : 0
+    if (Array.isArray(agentNode[field])) return agentNode[field].length
+    if (Array.isArray(node[field])) return node[field].length
+    return 0
   }
 
   // Calculate node depth from doc_no
   const getDepth = () => {
-    if (!node.doc_no) return 0
+    if (!displayDocNo) return 0
     // Count dots and add 1 (e.g., "A" = 1, "A.1" = 2, "A.1.2" = 3)
-    return node.doc_no.split('.').length
+    return displayDocNo.split('.').length
   }
 
   // Calculate tree stats
@@ -65,15 +74,15 @@ export function NodeDetailSidebar() {
         <div className="sidebar-header">
           <div className="header-content">
             <div className="doc-no" style={{ color: typeColor }}>
-              {node.doc_no}
+              {displayDocNo}
             </div>
-            <div className="node-name">{node.name}</div>
+            <div className="node-name">{displayName}</div>
             <div className="node-type-badge" style={{
               backgroundColor: typeColor + '20',
               borderColor: typeColor,
               color: typeColor
             }}>
-              {node.type}
+              {displayType}
             </div>
           </div>
           <button className="close-button" onClick={handleClose}>
@@ -84,10 +93,10 @@ export function NodeDetailSidebar() {
         <div className="sidebar-content">
           {/* Metadata Section */}
           <div className="metadata-section">
-            {node.last_modified && (
+            {(agentNode.last_modified || node.last_modified) && (
               <div className="metadata-item">
                 <span className="metadata-label">Last Modified:</span>
-                <span className="metadata-value">{node.last_modified || 'N/A'}</span>
+                <span className="metadata-value">{agentNode.last_modified || node.last_modified || 'N/A'}</span>
               </div>
             )}
 
@@ -121,11 +130,11 @@ export function NodeDetailSidebar() {
           </div>
 
           {/* Content Section */}
-          {node.content && (
+          {displayContent && (
             <div className="content-section">
               <h3 className="section-title">Content</h3>
               <div className="markdown-content">
-                <ReactMarkdown>{node.content}</ReactMarkdown>
+                <ReactMarkdown>{displayContent}</ReactMarkdown>
               </div>
             </div>
           )}

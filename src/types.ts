@@ -23,6 +23,9 @@ export interface TreeNodeProps {
   onToggle: (uuid: string) => void;
   onExpandAll: (uuid: string) => void;
   onSelect: (uuid: string) => void;
+  // Cherry picker props
+  chosenNodes?: Set<string>;
+  onChoose?: (uuid: string) => void;
 }
 
 /**

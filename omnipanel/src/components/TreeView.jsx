@@ -178,8 +178,8 @@ function ClickableTile({ node, position, agentColor, unifiedDocNo }) {
   )
 }
 
-export function TreeView({ selectedDatasets = ['launch_agent_6'], highlightMode = 'none' }) {
-  const { updateTreeData, selectedTile, selectTile, layoutAlgorithm } = useContext(SceneContext)
+export function TreeView({ selectedDatasets = ['launch_agent_5'] }) {
+  const { updateTreeData, selectedTile, selectTile, layoutAlgorithm, selectedTag, taggedDocNos } = useContext(SceneContext)
   const [agentsData, setAgentsData] = useState({}) // Map of datasetId -> agent data
   const [isLoading, setIsLoading] = useState(true)
   const [useSampleData, setUseSampleData] = useState(false)
@@ -293,7 +293,7 @@ export function TreeView({ selectedDatasets = ['launch_agent_6'], highlightMode 
       }
     }
 
-    // Start traversal from root nodes
+    // Start traversal from root nodes (for agent comparison or single scope/agent)
     const rootAgentNodes = {}
     selectedDatasets.forEach(datasetId => {
       rootAgentNodes[datasetId] = agentTrees[datasetId]?.[0]
@@ -353,8 +353,8 @@ export function TreeView({ selectedDatasets = ['launch_agent_6'], highlightMode 
     updateTreeData(nodes, isLoading, dataSource, bounds)
   }, [nodes, isLoading, useSampleData, selectedDatasets, updateTreeData, layout])
 
-  // Enable keyboard navigation (Left/Right arrows)
-  useKeyboardNavigation(nodes)
+  // Enable keyboard navigation (Left/Right arrows) - uses activeSet from context
+  useKeyboardNavigation()
 
   // Update selected tile with position info when selection changes
   useEffect(() => {
@@ -388,16 +388,23 @@ export function TreeView({ selectedDatasets = ['launch_agent_6'], highlightMode 
     )
   }
 
-  // Agent colors for visual distinction (high contrast for side-by-side comparison)
-  const AGENT_COLORS = {
-    'spark': '#ef4444',    // red
-    'grove': '#10b981',    // green
-    'keel': '#3b82f6',     // blue
+  // Colors for visual distinction (high contrast for side-by-side comparison)
+  const DATASET_COLORS = {
+    // Scopes (gold shades)
+    'scope_a0': '#fbbf24',     // gold
+    'scope_a1': '#f59e0b',     // amber
+    'scope_a2': '#d97706',     // orange
+    'scope_a3': '#b45309',     // dark amber
+    'scope_a4': '#92400e',     // brown
+    'scope_a5': '#78350f',     // dark brown
+    'scope_a6': '#fbbf24',     // gold (agent scope)
+    // Agents
+    'spark': '#ef4444',        // red
+    'grove': '#10b981',        // green
+    'keel': '#3b82f6',         // blue
     'launch_agent_3': '#f59e0b',  // amber
-    'launch_agent_4': '#8b5cf6',  // purple
-    'prysm': '#ec4899',    // pink
-    'launch_agent_6': '#06b6d4',  // cyan
-    'la6_old': '#f97316',  // orange (high contrast with cyan)
+    'obex': '#8b5cf6',         // purple
+    'launch_agent_5': '#06b6d4',  // cyan
   }
 
   return (
@@ -425,6 +432,11 @@ export function TreeView({ selectedDatasets = ['launch_agent_6'], highlightMode 
         // Check if this node is selected
         const isNodeSelected = selectedTile?.doc_no === node.doc_no
 
+        // Check if this node matches the selected tag
+        const isTagged = selectedTag && taggedDocNos.size > 0 && node.agents?.some(
+          agentData => taggedDocNos.has(agentData.node.doc_no)
+        )
+
         return (
           <group key={node.doc_no}>
             {/* Blue background */}
@@ -437,12 +449,12 @@ export function TreeView({ selectedDatasets = ['launch_agent_6'], highlightMode 
               />
             </mesh>
 
-            {/* Border frame - gold when selected, silver otherwise, highlight colors for occupancy modes */}
+            {/* Border frame - gold when selected, cyan when tagged, silver otherwise */}
             {(() => {
               const bgWidth = totalWidth + tileWidth + tileWidth * 0.3
               const bgHeight = position.size * 1.15
 
-              // Determine border color and effects based on selection and highlight mode
+              // Determine border color and effects based on selection and tag
               let borderColor = "#f3f4f6" // Default silver
               let borderThickness = 0.03
               let emissiveColor = "#000000"
@@ -454,17 +466,12 @@ export function TreeView({ selectedDatasets = ['launch_agent_6'], highlightMode 
                 borderThickness = 0.05
                 emissiveColor = "#fbbf24"
                 emissiveIntensity = 0.8
-              } else if (highlightMode === 'full' && node.agents.length === selectedDatasets.length) {
-                borderColor = "#fbbf24" // Gold for all slots filled
-                borderThickness = 0.06
-                emissiveColor = "#fbbf24"
-                emissiveIntensity = 1.5
-                shouldPulse = true
-              } else if (highlightMode === 'partial' && node.agents.length < selectedDatasets.length) {
-                borderColor = "#fbbf24" // Gold for has empty slots
-                borderThickness = 0.06
-                emissiveColor = "#fbbf24"
-                emissiveIntensity = 1.5
+              } else if (isTagged) {
+                // BRIGHT cyan pulsing border for tagged nodes - very visible
+                borderColor = "#22d3ee" // Brighter cyan
+                borderThickness = 0.12  // Much thicker
+                emissiveColor = "#22d3ee"
+                emissiveIntensity = 3.0 // Much brighter glow
                 shouldPulse = true
               }
 
@@ -553,7 +560,7 @@ export function TreeView({ selectedDatasets = ['launch_agent_6'], highlightMode 
                   key={`${node.doc_no}-${agentData.agentId}`}
                   node={agentData.node}
                   position={{ ...position, x: slotX }}
-                  agentColor={AGENT_COLORS[agentData.agentId]}
+                  agentColor={DATASET_COLORS[agentData.agentId]}
                   unifiedDocNo={node.doc_no}
                 />
               )

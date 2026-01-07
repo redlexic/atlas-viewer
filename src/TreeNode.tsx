@@ -1,4 +1,4 @@
-import { Box, Group, Text, ActionIcon, Badge, Paper } from '@mantine/core';
+import { Box, Group, Text, ActionIcon, Badge, Paper, Checkbox } from '@mantine/core';
 import { IconChevronRight, IconChevronDown, IconChevronsDown } from '@tabler/icons-react';
 import ReactMarkdown from 'react-markdown';
 import { useEffect, useRef } from 'react';
@@ -14,11 +14,14 @@ export const TreeNode = ({
   onToggle,
   onExpandAll,
   onSelect,
+  chosenNodes,
+  onChoose,
 }: TreeNodeProps) => {
   const children = getChildren(node);
   const hasChildren = children.length > 0;
   const isExpanded = expandedNodes.has(node.uuid);
   const isSelected = selectedNodeId === node.uuid;
+  const isChosen = chosenNodes?.has(node.uuid) || false;
   const childCount = node.childCount || 0;
   const nodeRef = useRef<HTMLDivElement>(null);
 
@@ -41,7 +44,7 @@ export const TreeNode = ({
   };
 
   return (
-    <Box style={{ marginLeft: level * 16 }}>
+    <Box style={{ marginLeft: level * 10 }}>
       <Paper
         ref={nodeRef}
         p={isSelected ? 'md' : 'sm'}
@@ -57,6 +60,9 @@ export const TreeNode = ({
           borderWidth: isSelected ? '2px' : undefined,
           transform: isSelected ? 'scale(1.02)' : undefined,
           transition: 'all 0.2s ease',
+          outline: isChosen ? '2px solid var(--mantine-color-green-6)' : undefined,
+          outlineOffset: isChosen ? '2px' : undefined,
+          position: 'relative',
         }}
         onClick={handleClick}
       >
@@ -91,7 +97,7 @@ export const TreeNode = ({
             </Box>
           </Group>
 
-          <Group gap="xs">
+          <Group gap="xs" style={{ paddingRight: onChoose ? 36 : 0 }}>
             {hasChildren && (
               <>
                 <Badge size="sm" color="gray" variant="outline">
@@ -110,6 +116,26 @@ export const TreeNode = ({
             )}
           </Group>
         </Group>
+
+        {onChoose && (
+          <Checkbox
+            checked={isChosen}
+            onChange={(e) => {
+              e.stopPropagation();
+              onChoose(node.uuid);
+            }}
+            onClick={(e) => e.stopPropagation()}
+            color="green"
+            size="md"
+            title={isChosen ? 'Remove from selection' : 'Add to selection'}
+            style={{
+              position: 'absolute',
+              right: 8,
+              top: '50%',
+              transform: 'translateY(-50%)',
+            }}
+          />
+        )}
 
         {node.content && (
           <Box mt="md" pl={hasChildren ? 36 : 0}>
@@ -132,6 +158,8 @@ export const TreeNode = ({
               onToggle={onToggle}
               onExpandAll={onExpandAll}
               onSelect={onSelect}
+              chosenNodes={chosenNodes}
+              onChoose={onChoose}
             />
           ))}
         </Box>

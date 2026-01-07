@@ -1,46 +1,32 @@
-import { useEffect, useMemo, useContext } from 'react'
+import { useEffect, useContext } from 'react'
 import { SceneContext } from '../context/SceneContext'
 
 /**
- * Keyboard navigation for tree nodes
+ * Keyboard navigation through the active set of nodes
  *
- * Navigation semantics:
- * - Right Arrow: Move to next node in depth-first order
- * - Left Arrow: Move to previous node in depth-first order
- * - Escape: Deselect current node
+ * The active set is determined by SceneContext:
+ * - When no tag is selected: all nodes
+ * - When a tag is selected: only nodes matching that tag
  *
- * Depth-first order example:
- *   A
- *   ├─ B
- *   │  ├─ D
- *   │  └─ E
- *   └─ C
- *      └─ F
- *
- * Order: A → B → D → E → C → F
+ * Navigation:
+ * - Right Arrow: Move to next node in active set
+ * - Left Arrow: Move to previous node in active set
+ * - Escape: Deselect current node and clear tag filter
  */
-export function useKeyboardNavigation(nodes) {
-  const { selectedTile, selectTile, updateNavigationState } = useContext(SceneContext)
+export function useKeyboardNavigation() {
+  const {
+    activeSet,
+    activeSetIndex,
+    selectTile,
+    updateNavigationState,
+    selectedTag,
+    clearTag
+  } = useContext(SceneContext)
 
-  // Use nodes directly (they're already in tree order)
-  const flattenedNodes = useMemo(() => {
-    if (!nodes || nodes.length === 0) return []
-
-    // Nodes are already processed and aligned, just use them directly
-    return nodes
-  }, [nodes])
-
-  // Find index of currently selected node
-  const currentIndex = useMemo(() => {
-    if (!selectedTile || flattenedNodes.length === 0) return -1
-
-    return flattenedNodes.findIndex(node => node.doc_no === selectedTile.doc_no)
-  }, [selectedTile, flattenedNodes])
-
-  // Update navigation state in context
+  // Update navigation state in context (shows position in HUD)
   useEffect(() => {
-    updateNavigationState(currentIndex, flattenedNodes.length)
-  }, [currentIndex, flattenedNodes.length, updateNavigationState])
+    updateNavigationState(activeSetIndex, activeSet.length)
+  }, [activeSetIndex, activeSet.length, updateNavigationState])
 
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -49,21 +35,21 @@ export function useKeyboardNavigation(nodes) {
         return
       }
 
-      // Ignore if no nodes available
-      if (flattenedNodes.length === 0) return
+      // Ignore if no nodes in active set
+      if (activeSet.length === 0) return
 
       let newIndex = -1
 
       switch (event.key) {
         case 'ArrowRight':
           event.preventDefault()
-          // Move to next node
-          if (currentIndex === -1) {
+          // Move to next node in active set
+          if (activeSetIndex === -1) {
             // No selection, select first node
             newIndex = 0
-          } else if (currentIndex < flattenedNodes.length - 1) {
+          } else if (activeSetIndex < activeSet.length - 1) {
             // Move to next node
-            newIndex = currentIndex + 1
+            newIndex = activeSetIndex + 1
           } else {
             // At last node, wrap to first
             newIndex = 0
@@ -72,23 +58,26 @@ export function useKeyboardNavigation(nodes) {
 
         case 'ArrowLeft':
           event.preventDefault()
-          // Move to previous node
-          if (currentIndex === -1) {
+          // Move to previous node in active set
+          if (activeSetIndex === -1) {
             // No selection, select last node
-            newIndex = flattenedNodes.length - 1
-          } else if (currentIndex > 0) {
+            newIndex = activeSet.length - 1
+          } else if (activeSetIndex > 0) {
             // Move to previous node
-            newIndex = currentIndex - 1
+            newIndex = activeSetIndex - 1
           } else {
             // At first node, wrap to last
-            newIndex = flattenedNodes.length - 1
+            newIndex = activeSet.length - 1
           }
           break
 
         case 'Escape':
           event.preventDefault()
-          // Deselect current node
+          // Deselect current node and clear tag filter
           selectTile(null)
+          if (selectedTag) {
+            clearTag()
+          }
           return
 
         default:
@@ -96,20 +85,21 @@ export function useKeyboardNavigation(nodes) {
       }
 
       // Select the new node
-      if (newIndex !== -1 && flattenedNodes[newIndex]) {
-        const node = flattenedNodes[newIndex]
+      if (newIndex !== -1 && activeSet[newIndex]) {
+        const node = activeSet[newIndex]
         selectTile(node)
       }
     }
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [flattenedNodes, currentIndex, selectTile])
+  }, [activeSet, activeSetIndex, selectTile, selectedTag, clearTag])
 
-  // Return flattened nodes and current index for debugging
+  // Return navigation info for debugging/display
   return {
-    flattenedNodes,
-    currentIndex,
-    totalNodes: flattenedNodes.length
+    activeSet,
+    activeSetIndex,
+    totalInActiveSet: activeSet.length,
+    isFiltered: selectedTag !== null
   }
 }

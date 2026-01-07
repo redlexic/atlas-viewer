@@ -53,6 +53,17 @@ interface AgentComparisonAlignedProps {
   onCustomEditsChange: (edits: Record<string, { name?: string; content?: string }>) => void;
 }
 
+// Collect all UUIDs from a node and its descendants
+const collectNodeUuids = (node: AtlasNode): Set<string> => {
+  const uuids = new Set<string>();
+  const collect = (n: AtlasNode) => {
+    uuids.add(n.uuid);
+    getChildren(n).forEach(collect);
+  };
+  collect(node);
+  return uuids;
+};
+
 interface UnifiedSection {
   name: string;
   nodes: (AtlasNode | null)[];
@@ -104,6 +115,7 @@ const AlignedNodeRow = memo(
     agentNames,
     expandedNodes,
     onToggle,
+    onExpandDescendants,
     docNoSuffix,
     selectedSections,
     onSectionSelect,
@@ -119,6 +131,7 @@ const AlignedNodeRow = memo(
     agentNames: string[];
     expandedNodes: Set<string>;
     onToggle: (uuid: string) => void;
+    onExpandDescendants: (node: AtlasNode) => void;
     docNoSuffix: string;
     selectedSections: Record<string, { agentName: string; node: AtlasNode }>;
     onSectionSelect: (
@@ -261,9 +274,20 @@ const AlignedNodeRow = memo(
                       {node.type}
                     </Badge>
                     {childCount > 0 && (
-                      <Badge size="xs" variant="filled" color="gray">
-                        {childCount}
-                      </Badge>
+                      <Tooltip label={`Click to expand all ${childCount} descendants`}>
+                        <Badge
+                          size="xs"
+                          variant="filled"
+                          color="gray"
+                          style={{ cursor: 'pointer' }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onExpandDescendants(node);
+                          }}
+                        >
+                          {childCount}
+                        </Badge>
+                      </Tooltip>
                     )}
                   </Group>
                   <Text
@@ -563,6 +587,7 @@ const AlignedNodeRow = memo(
                 agentNames={agentNames}
                 expandedNodes={expandedNodes}
                 onToggle={onToggle}
+                onExpandDescendants={onExpandDescendants}
                 docNoSuffix={section.name}
                 selectedSections={selectedSections}
                 onSectionSelect={onSectionSelect}
@@ -712,6 +737,15 @@ export const AgentComparisonAligned = ({
 
   const collapseAll = () => {
     setExpandedNodes(new Set());
+  };
+
+  const handleExpandDescendants = (node: AtlasNode) => {
+    const nodeUuids = collectNodeUuids(node);
+    setExpandedNodes((prev) => {
+      const newSet = new Set(prev);
+      nodeUuids.forEach((uuid) => newSet.add(uuid));
+      return newSet;
+    });
   };
 
   const totalColumns = agents.length + (showBuilder ? 1 : 0);
@@ -876,6 +910,7 @@ export const AgentComparisonAligned = ({
         agentNames={agentNames}
         expandedNodes={expandedNodes}
         onToggle={handleToggle}
+        onExpandDescendants={handleExpandDescendants}
         docNoSuffix="ROOT"
         selectedSections={selectedSections}
         onSectionSelect={onSectionSelect}

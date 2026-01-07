@@ -6,8 +6,8 @@ export const KNOWN_AGENT_NAMES = [
   'Grove',
   'Keel',
   'Launch Agent 3',
-  'Launch Agent 4',
-  'Launch Agent 6',
+  'Obex',
+  'Launch Agent 5',
 ];
 
 /**
@@ -18,8 +18,8 @@ export const KNOWN_TOKEN_SYMBOLS = [
   'GROVE',
   'KEEL',
   'AGENT3',
-  'AGENT4',
-  'AGENT6',
+  'OBEX',
+  'AGENT5',
 ];
 
 /**

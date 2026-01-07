@@ -15,8 +15,8 @@ export function ComparisonPage() {
     Grove: true,
     Keel: true,
     'Launch Agent 3': true,
-    'Launch Agent 4': true,
-    'Launch Agent 6': true,
+    'Obex': true,
+    'Launch Agent 5': true,
     Builder: true,
   });
   const [selectedSections, setSelectedSections] = useState<

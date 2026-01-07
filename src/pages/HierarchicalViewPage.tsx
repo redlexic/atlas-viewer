@@ -8,7 +8,7 @@ import '@omnipanel/App.css'
  * Hierarchical View Page
  *
  * 3D tree visualization using React Three Fiber
- * Displays Launch Agent 6 data in an interactive hierarchical layout
+ * Displays Atlas agents in an interactive hierarchical layout
  */
 export function HierarchicalViewPage() {
   return (

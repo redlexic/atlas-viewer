@@ -3,11 +3,11 @@
 // import { GridOverlay } from './GridOverlay'
 import { TreeView } from './TreeView'
 
-export function PlaneComposite({ selectedDatasets, highlightMode }) {
+export function PlaneComposite({ selectedDatasets }) {
   return (
     <group>
       {/* Background plane removed - just showing tree tiles */}
-      <TreeView selectedDatasets={selectedDatasets} highlightMode={highlightMode} />
+      <TreeView selectedDatasets={selectedDatasets} />
     </group>
   )
 }

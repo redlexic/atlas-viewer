@@ -164,3 +164,61 @@ export const countAllChildren = (node: AtlasNode): number => {
   });
   return count;
 };
+
+/**
+ * Get all ancestor UUIDs of a node (from root to parent)
+ * Returns array ordered from root to immediate parent
+ */
+export const getAncestors = (
+  nodes: AtlasNode[],
+  targetUuid: string
+): string[] => {
+  const path: string[] = [];
+
+  const findPath = (nodeList: AtlasNode[], target: string): boolean => {
+    for (const node of nodeList) {
+      if (node.uuid === target) {
+        return true;
+      }
+      const children = getChildren(node);
+      if (findPath(children, target)) {
+        path.unshift(node.uuid);
+        return true;
+      }
+    }
+    return false;
+  };
+
+  findPath(nodes, targetUuid);
+  return path;
+};
+
+/**
+ * Build a tree structure from selected UUIDs
+ * Returns nodes in hierarchical order based on doc_no
+ */
+export const buildSelectedTree = (
+  nodes: AtlasNode[],
+  selectedUuids: Set<string>
+): AtlasNode[] => {
+  const selectedNodes: AtlasNode[] = [];
+
+  const collectSelected = (nodeList: AtlasNode[]) => {
+    for (const node of nodeList) {
+      if (selectedUuids.has(node.uuid)) {
+        selectedNodes.push(node);
+      }
+      const children = getChildren(node);
+      collectSelected(children);
+    }
+  };
+
+  collectSelected(nodes);
+
+  // Sort by doc_no
+  selectedNodes.sort((a, b) =>
+    a.doc_no.localeCompare(b.doc_no, undefined, { numeric: true })
+  );
+
+  return selectedNodes;
+};

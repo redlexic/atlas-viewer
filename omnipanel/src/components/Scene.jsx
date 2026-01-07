@@ -1,29 +1,29 @@
 import { useContext, useRef, useState, useEffect } from 'react'
 import { Canvas } from '@react-three/fiber'
-import { OrbitControls } from '@react-three/drei'
+import { MapControls } from '@react-three/drei'
 import { PlaneComposite } from './PlaneComposite'
 import { SceneContext } from '../context/SceneContext'
 import { useZoomToTile } from '../hooks/useZoomToTile'
 import { useViewModes } from '../hooks/useViewModes'
 import { DatasetSwitcher } from './hud/DatasetSwitcher'
 import { AlgorithmSwitcher } from './hud/AlgorithmSwitcher'
-import { HighlightControls } from './hud/HighlightControls'
+import { TagSelector } from './hud/TagSelector'
+import { TaggedNodesList } from './hud/TaggedNodesList'
 
-function SceneContent({ controlsRef, selectedDatasets, highlightMode }) {
+function SceneContent({ controlsRef, selectedDatasets }) {
   const { selectedTile, isOrthographic } = useContext(SceneContext)
 
   // Pan to selected tile (maintains zoom) + mouse wheel zoom control
   useZoomToTile(selectedTile, controlsRef, isOrthographic)
 
-  return <PlaneComposite selectedDatasets={selectedDatasets} highlightMode={highlightMode} />
+  return <PlaneComposite selectedDatasets={selectedDatasets} />
 }
 
 export function Scene() {
   const { isOrthographic, treeBounds, selectedTile } = useContext(SceneContext)
   const controlsRef = useRef()
-  const [selectedDatasets, setSelectedDatasets] = useState(['launch_agent_6'])
+  const [selectedDatasets, setSelectedDatasets] = useState(['launch_agent_5'])
   const [camera, setCamera] = useState(null)
-  const [highlightMode, setHighlightMode] = useState('none') // 'none', 'full', 'partial'
 
   // Get camera reference from controls
   useEffect(() => {
@@ -67,6 +67,11 @@ export function Scene() {
 
   const handleDatasetToggle = (datasetId) => {
     setSelectedDatasets(prev => {
+      // If a scope is currently selected, ignore agent toggles
+      if (prev.some(id => id.startsWith('scope_'))) {
+        return prev
+      }
+
       if (prev.includes(datasetId)) {
         // Remove if already selected (but keep at least one)
         return prev.length > 1 ? prev.filter(id => id !== datasetId) : prev
@@ -77,16 +82,33 @@ export function Scene() {
     })
   }
 
+  const handleScopeSelect = (scopeId) => {
+    setSelectedDatasets(prev => {
+      // If clicking the same scope, deselect and go back to default agent
+      if (prev.includes(scopeId)) {
+        return ['launch_agent_5']
+      }
+      // Otherwise, select only this scope
+      return [scopeId]
+    })
+    // Reset initialization so camera re-centers on new data
+    hasInitializedRef.current = false
+  }
+
   return (
     <>
       {/* Dataset switcher - rendered outside Canvas as DOM element */}
-      <DatasetSwitcher selectedDatasets={selectedDatasets} onDatasetToggle={handleDatasetToggle} />
+      <DatasetSwitcher
+        selectedDatasets={selectedDatasets}
+        onDatasetToggle={handleDatasetToggle}
+        onScopeSelect={handleScopeSelect}
+      />
 
-      {/* Algorithm switcher - switch between tree layout algorithms */}
-      {/* <AlgorithmSwitcher /> */}
+      {/* Tag selector - filter and navigate by semantic tags */}
+      <TagSelector />
 
-      {/* Highlight controls - highlight nodes by occupancy */}
-      <HighlightControls highlightMode={highlightMode} onHighlightChange={setHighlightMode} />
+      {/* Tagged nodes list - shows all nodes matching selected tag */}
+      <TaggedNodesList />
 
       <Canvas
         key={isOrthographic ? 'ortho' : 'persp'}
@@ -103,20 +125,22 @@ export function Scene() {
         <ambientLight intensity={0.5} />
         <pointLight position={[10, 10, 10]} />
 
-        {/* Camera controls - wheel zoom, right-click pan */}
-        <OrbitControls
+        {/* MapControls - designed for 2D/top-down views
+            - Left-click drag to pan (like Miro/Illustrator hand tool)
+            - Right-click drag also pans
+            - Scroll wheel zooms (handled by custom hook for zoom-toward-mouse)
+        */}
+        <MapControls
           ref={controlsRef}
-          enableRotate={false}  // Disable rotation for top-down view
-          enablePan={true}      // Enable panning with right-click/drag
-          enableZoom={true}     // Enable wheel zoom (handled by custom hook)
-          enableDamping={false} // Disable damping for immediate response
-          panSpeed={2.0}        // Increased for more responsive panning
-          zoomSpeed={0.5}
-          minZoom={0.1}         // Zoom out limit - allow very far zoom
-          maxZoom={20}          // Zoom in limit - allow closer zoom
+          enableRotate={false}    // Disable rotation for top-down view
+          enablePan={true}        // Enable panning with left-click drag
+          enableZoom={true}       // Will be overridden by custom handler
+          enableDamping={false}   // Disable damping for immediate response
+          panSpeed={1.5}          // Pan speed multiplier
+          screenSpacePanning={true} // Pan in screen space (more intuitive)
         />
 
-        <SceneContent controlsRef={controlsRef} selectedDatasets={selectedDatasets} highlightMode={highlightMode} />
+        <SceneContent controlsRef={controlsRef} selectedDatasets={selectedDatasets} />
       </Canvas>
     </>
   )
