@@ -29,7 +29,7 @@ export async function loadAgentData(filename) {
  * @returns {Promise<Array>} - Full Atlas data
  */
 export async function loadAtlas() {
-  return loadAgentData('atlas-2025-12-11.json')
+  return loadAgentData('atlas-2026-01-14.json')
 }
 
 /**

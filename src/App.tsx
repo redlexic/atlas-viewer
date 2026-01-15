@@ -3,6 +3,7 @@ import { Container, Box, Group, Button } from '@mantine/core';
 import { AtlasViewerPage } from './pages/AtlasViewerPage';
 import { ComparisonPage } from './pages/ComparisonPage';
 import { HierarchicalViewPage } from './pages/HierarchicalViewPage';
+import { DiffPage } from './pages/DiffPage';
 
 function Navigation() {
   const location = useLocation();
@@ -35,6 +36,14 @@ function Navigation() {
           >
             Hierarchical View
           </Button>
+          <Button
+            component={Link}
+            to="/diff"
+            variant={location.pathname === '/diff' ? 'filled' : 'light'}
+            color={location.pathname === '/diff' ? 'green' : 'gray'}
+          >
+            Changeset Diff
+          </Button>
         </Group>
       </Container>
     </Box>
@@ -49,6 +58,7 @@ function App() {
         <Route path="/" element={<AtlasViewerPage />} />
         <Route path="/comparison" element={<ComparisonPage />} />
         <Route path="/hierarchical" element={<HierarchicalViewPage />} />
+        <Route path="/diff" element={<DiffPage />} />
       </Routes>
     </Router>
   );

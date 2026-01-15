@@ -1,0 +1,981 @@
+{
+  "source": "atlas-2026-01-14.json",
+  "extraction_date": "2026-01-14T18:34:57.092Z",
+  "search_term": "Launch Agent 3",
+  "section_count": 139,
+  "sections": [
+    {
+      "doc_no": "A.3.7.1.5.5",
+      "name": "Genesis Agents",
+      "type": "Core",
+      "uuid": "8952aac5-24fb-4da1-ae10-49f86d30aecd",
+      "content": "Genesis Agents are Agents that receive capital contributions from Sky, including, without limitation:\n\n- Spark\n- Grove\n- Keel\n- Launch Agent 3\n- Obex\n- Core Council Executor Agent 1"
+    },
+    {
+      "doc_no": "A.6.1.1.4",
+      "name": "Launch Agent 3",
+      "type": "Core",
+      "uuid": "c88439b5-f456-4e51-8825-42e0ba83546f",
+      "content": "The documents herein specify all of the logic for Launch Agent 3, including Launch Agent 3’s strategy and how it uses the Sky Primitives to operationalize this strategy."
+    },
+    {
+      "doc_no": "A.6.1.1.4.1",
+      "name": "Introduction",
+      "type": "Core",
+      "uuid": "a09ca807-8649-45d0-8e80-62baeb042995",
+      "content": "Launch Agent 3 is an Agent specializing in creating accessible and user-friendly DeFi interfaces. It operates the Launch Agent 3 Frontend user interface. \n\nLaunch Agent 3 Frontend is a non-custodial web application serving as a gateway to the Sky Protocol. Through its AI-powered interface, Launch Agent 3 Frontend makes digital asset interactions intuitive and accessible for users of all experience levels—all while ensuring users maintain complete control of their assets. Launch Agent 3 Frontend never takes custody of users' private keys or assets; users retain full responsibility for managing their private keys and digital wallet access."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2",
+      "name": "Sky Primitives",
+      "type": "Core",
+      "uuid": "614f046c-829b-4330-a462-adff2245b36d",
+      "content": "The documents herein implement the Sky Primitives for Launch Agent 3. See [A.2.3 - Sky Primitives](fcde2604-a138-4c1b-9d9a-14895835c907)."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.1",
+      "name": "Genesis Primitives",
+      "type": "Core",
+      "uuid": "f08231e6-caa9-490d-9d7f-4f65f9076084",
+      "content": "The documents herein implement the Genesis Primitives for Launch Agent 3. See [A.2.3.4 - Genesis Primitives](3d5e3668-8333-4908-adcc-5784cfe7f6b5)."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.1.1",
+      "name": "Agent Creation Primitive",
+      "type": "Core",
+      "uuid": "301c4673-0279-49e8-9c3b-e810e8223234",
+      "content": "The documents herein contain all data and specifications for Launch Agent 3’s Instance of the Agent Creation Primitive. See [A.2.3.4.1 - Agent Creation Primitive](82b95f6d-4883-4f08-ac3a-9d8189013fbe)."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.1.1.1",
+      "name": "Primitive Hub Document",
+      "type": "Core",
+      "uuid": "df8efa45-85c4-4c66-b984-a5ddfc3f3522",
+      "content": "The documents herein organize all base information relevant to Launch Agent 3’s usage of the Agent Creation Primitive."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.1.1.3.1.1.1",
+      "name": "Name",
+      "type": "Core",
+      "uuid": "46d00c31-8877-4db8-981a-659276a86938",
+      "content": "The name of the Agent is Launch Agent 3."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.1.1.3.1.1.2",
+      "name": "SubProxy Account",
+      "type": "Core",
+      "uuid": "daed1676-6039-459e-9136-5e31617d756b",
+      "content": "The address of Launch Agent 3’s SubProxy Account will be specified in a future iteration of the Launch Agent 3 Artifact."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.1.1.3.1.1.3",
+      "name": "Genesis Account",
+      "type": "Core",
+      "uuid": "082cb114-b47e-4371-afe5-d7bcba70704a",
+      "content": "The address of Launch Agent 3’s Genesis Account will be specified in a future iteration of the Launch Agent 3 Artifact."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.1.2",
+      "name": "Prime Transformation Primitive",
+      "type": "Core",
+      "uuid": "4da364d5-3b83-4858-a820-12d4980f6977",
+      "content": "The documents herein contain all data and specifications for Launch Agent 3’s instance of the Prime Transformation Primitive. See [A.2.3.4.2 - Prime Transformation Primitive](81411106-fd6d-4f9c-b3ae-7af7b5e62482)."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.1.2.1",
+      "name": "Primitive Hub Document",
+      "type": "Core",
+      "uuid": "f4d35d37-831f-4eee-b18f-d9a3d266655e",
+      "content": "The documents herein organize all base information relevant to Launch Agent 3’s usage of the Prime Transformation Primitive."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.1.2.3.1.1.1",
+      "name": "Agent Type",
+      "type": "Core",
+      "uuid": "afa9a16f-e776-40f1-8e34-923ae661517a",
+      "content": "Launch Agent 3 is a Prime Agent."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.1.3",
+      "name": "Executor Transformation Primitive",
+      "type": "Core",
+      "uuid": "4e2edd9e-61c2-4be1-8cb3-f2be5e1587f3",
+      "content": "The documents herein contain all data and specifications for Launch Agent 3’s instance of the Executor Transformation Primitive. See [A.2.3.4.3 - Executor Transformation Primitive](2f249be5-8edb-41e4-b429-734e1ba2cbc7)."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.1.3.1",
+      "name": "Primitive Hub Document",
+      "type": "Core",
+      "uuid": "f60f5f5f-3aa8-49de-85fb-95841bb73bdb",
+      "content": "The documents herein organize all base information relevant to Launch Agent 3’s usage of the Executor Transformation Primitive."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.1.4",
+      "name": "Agent Token Primitive",
+      "type": "Core",
+      "uuid": "a4708a14-1030-4935-a4a5-103826d9d4a5",
+      "content": "The documents herein contain all data and specifications for Launch Agent 3’s Instance of the Agent Token Primitive. See [A.2.3.4.4 - Agent Token Primitive](2047c361-db28-4952-a70c-83d07b562064)."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.1.4.1",
+      "name": "Primitive Hub Document",
+      "type": "Core",
+      "uuid": "ffa68419-fc61-4b60-a4d5-7c1ca4aace6d",
+      "content": "The documents herein organize all base information relevant to Launch Agent 3’s usage of the Agent Token Primitive."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.1.4.2.1.1.1",
+      "name": "Token Name",
+      "type": "Core",
+      "uuid": "1b5f18b6-ca5f-4c2a-be90-a8e270643e9b",
+      "content": "The name of Launch Agent 3’s token is Launch Agent 3."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.1.4.2.1.1.2",
+      "name": "Token Symbol",
+      "type": "Core",
+      "uuid": "8eb04812-6fe7-43dc-a461-afa09b992cc8",
+      "content": "The symbol of Launch Agent 3’s token is AGENT3."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.1.4.2.1.1.3",
+      "name": "Genesis Supply",
+      "type": "Core",
+      "uuid": "bc80a5e5-4ef7-4255-9e97-848c9cbbeb36",
+      "content": "The Genesis Supply of AGENT3 will be specified in a future iteration of the Launch Agent 3 Artifact."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.1.4.2.1.1.4",
+      "name": "Token Address",
+      "type": "Core",
+      "uuid": "b2270863-75e9-42f6-8c25-749a0f83dcb5",
+      "content": "The address of AGENT3 will be specified in a future iteration of the Launch Agent 3 Artifact."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.1.4.2.1.1.5",
+      "name": "Token Admin",
+      "type": "Core",
+      "uuid": "1f692794-fc64-4cf8-86a7-fabc865eb428",
+      "content": "The token Admin will be specified in a future iteration of the Launch Agent 3 Artifact."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.1.4.2.1.1.6",
+      "name": "Token Emissions",
+      "type": "Core",
+      "uuid": "f56670f9-5a43-4b47-b94a-99026f8d87c0",
+      "content": "Token emissions beyond the Genesis Supply are permanently disabled; this cannot be reverted by Launch Agent 3 Governance. Sky Governance retains the ability to revert where Launch Agent 3 is in violation of Risk Capital requirements and emissions are required by the Risk Framework. See [A.3.2 - Risk Capital](55999acf-75fe-4adf-8584-9746ef50d3e4)."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.1.4.2.1.2",
+      "name": "Operational Process Definition",
+      "type": "Core",
+      "uuid": "652b94ef-66e3-40fe-ba80-4ce5c3d27f03",
+      "content": "The documents herein define the operational processes for minting and initial distribution of the tokens from the Genesis Supply.\n- These processes will be defined in a future iteration of the Launch Agent 3 Artifact."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.2",
+      "name": "Operational Primitives",
+      "type": "Core",
+      "uuid": "b0336f9e-09fd-415f-a86d-57220811dc80",
+      "content": "The documents herein implement the Operational Primitives for Launch Agent 3. See [A.2.3.5 - Operational Primitives](0192ec95-9207-480e-8c51-88d2a1da95ad)."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.2.1",
+      "name": "Executor Accord Primitive",
+      "type": "Core",
+      "uuid": "bb6c188b-ae69-4573-8104-44f9577427a1",
+      "content": "The documents herein contain all data and specifications for Launch Agent 3’s Instances of the Executor Accord Primitive. See [A.2.3.5.1 - Executor Accord Primitive](88017877-3ec1-4c43-a035-6bebdf11d9bb)."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.2.1.1",
+      "name": "Primitive Hub Document",
+      "type": "Core",
+      "uuid": "8f799c9e-618c-407f-a4a1-899f32d13d52",
+      "content": "The documents herein organize all base information relevant to Launch Agent 3’s usage of the Executor Accord Primitive."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.2.2",
+      "name": "Root Edit Primitive",
+      "type": "Core",
+      "uuid": "24517c43-dec9-44ec-bc03-e76671dc2e74",
+      "content": "The documents herein contain all data and specifications for Launch Agent 3’s Instance of the Root Edit Primitive. See [A.2.3.5.2 - Root Edit Primitive](78488c6b-d77f-4344-b954-476e415a2c7d)."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.2.2.1",
+      "name": "Primitive Hub Document",
+      "type": "Core",
+      "uuid": "787f01b6-0503-49aa-8dd1-f08ad222a5c9",
+      "content": "The documents herein organize all base information relevant to Launch Agent 3’s usage of the Root Edit Primitive."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.2.2.2.1.2",
+      "name": "Operational Process Definition",
+      "type": "Core",
+      "uuid": "010ed495-c693-4d27-8c18-aa24b64e2715",
+      "content": "The documents herein define the process for using the Root Edit Primitive to update the Launch Agent 3 Agent Artifact. Information on Launch Agent 3 governance that is unrelated to the use of the Root Edit Primitive is located at [A.6.1.1.4.3.1 - Governance Information Unrelated To Root Edit Primitive](70804058-8a1b-45ee-bf21-b09a5daefdb9)."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.2.2.2.1.2.1",
+      "name": "Routine Protocol",
+      "type": "Core",
+      "uuid": "759db362-3e1b-4ee8-b07e-9c61f7818154",
+      "content": "The documents herein define the process for using the Root Edit Primitive to update the Launch Agent 3 Agent Artifact in routine or normal conditions (i.e., non-emergency situations)."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.2.2.2.1.2.1.1",
+      "name": "Root Edit Proposal Submission",
+      "type": "Core",
+      "uuid": "f57f157c-c260-4671-8150-01acabcd286d",
+      "content": "The Root Edit process begins with an AGENT3 token holder submitting a proposal through the Powerhouse system containing a draft Artifact Edit Proposal. An AGENT3 token holder must hold at least 1% of the circulating token supply to submit a proposal. The proposal must also be posted on the Sky Forum under the “Launch Agent 3 Prime” category."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.2.2.2.1.2.1.1.2",
+      "name": "Short-Term Transitionary Measures",
+      "type": "Core",
+      "uuid": "f88fc097-7e41-41d7-aac9-992a9a11919f",
+      "content": "Until the Powerhouse system supports submitting Artifact Edit Proposals, AGENT3 token holders may submit Artifact Edit Proposals by posting them to the Sky Forum under the “Launch Agent 3 Prime” category. The title of the post must include the text “Launch Agent 3 Artifact Edit Proposal”. The post must include cryptographic proof that the author controls an account holding the required percentage of the total AGENT3 token supply specified in [A.6.1.1.4.2.2.2.2.1.2.1.1 - Root Edit Proposal Submission](f57f157c-c260-4671-8150-01acabcd286d)."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.2.2.2.1.2.1.2",
+      "name": "Root Edit Expert Advisor Review",
+      "type": "Core",
+      "uuid": "451079fe-fd11-4fef-ae51-6cb533a644c5",
+      "content": "A future iteration of the Launch Agent 3 Artifact will specify guidelines for obtaining specialized review of proposals requiring advanced technical or financial analysis."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.2.2.2.1.2.1.4",
+      "name": "Root Edit Token Holder Vote",
+      "type": "Core",
+      "uuid": "836b9942-8fdf-46df-bf38-f5adf87eb390",
+      "content": "Where their review of the proposal results in a finding of alignment with the Sky Core Atlas and Launch Agent 3 Artifact, the Operational Facilitator next triggers a Snapshot poll to allow token holders to vote on the proposal. The poll is open for three (3) days. A poll must have at least 10% of the circulating token supply participating and must have more than 50% of votes cast, excluding abstentions, in favor to be approved."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.2.2.2.1.2.1.6",
+      "name": "Artifact Edit Restrictions",
+      "type": "Core",
+      "uuid": "f3e8ecec-cb08-4682-9218-d13f567fc00e",
+      "content": "The Launch Agent 3 Artifact cannot be edited in any way that violates the Sky Core Atlas or its specifications of the Sky Primitives, or in any way that is otherwise misaligned. The Operational Facilitator must enforce this rule through their review of Artifact Edit Proposals."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.2.2.2.1.2.2",
+      "name": "Non-Routine Protocol",
+      "type": "Core",
+      "uuid": "e5477d87-ecc4-4eab-9e11-fe8d76791048",
+      "content": "The documents herein define the process for using the Root Edit Primitive to update the Launch Agent 3 Agent Artifact in non-routine conditions."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.2.2.2.1.2.3",
+      "name": "Emergency Protocol",
+      "type": "Core",
+      "uuid": "368ff139-9c2c-4b41-955e-e374996ad274",
+      "content": "The documents herein define the process for using the Root Edit Primitive to update the Launch Agent 3 Agent Artifact in urgent or emergency situations."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.2.2.2.1.2.3.1",
+      "name": "Root Edit Voting Process in Urgent and Emergency Situations",
+      "type": "Core",
+      "uuid": "5edc65d7-8023-4c03-b399-958c5f8869ff",
+      "content": "In an Urgent or Emergency Situation, as defined by the Sky Core Atlas in [A.1.8.1.1 - Definition Of Emergency Situations](5eafb29e-84a0-4a53-a798-3f958c880225), the Operational Facilitator may allow a Root Edit to occur more quickly than the timeline specified above. Where feasible, the Operational Facilitator should announce the decision to deploy the emergency Root Edit protocol and provide their reasoning via a public Sky Forum post (under the “Launch Agent 3 Prime” category), unless doing so would endanger Launch Agent 3 or its users."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.2.3",
+      "name": "Light Agent Primitive",
+      "type": "Core",
+      "uuid": "ceb79469-e43e-4640-9507-5d1d4eaea3cb",
+      "content": "The documents herein contain all data and specifications for Launch Agent 3’s Instances of the Light Agent Primitive. See [A.2.3.5.3 - Light Agent Primitive](44028423-2cd1-40cb-89ac-3f762b602b90)."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.2.3.1",
+      "name": "Primitive Hub Document",
+      "type": "Core",
+      "uuid": "04e7dd63-49ab-42dd-b195-1e309d7295c9",
+      "content": "The documents herein organize all base information relevant to Launch Agent 3’s usage of the Light Agent Primitive."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.3",
+      "name": "Ecosystem Upkeep Primitives",
+      "type": "Core",
+      "uuid": "833c1933-d81e-4653-af2c-aa03aac70883",
+      "content": "The documents herein implement the Ecosystem Upkeep Primitives for Launch Agent 3. See [A.2.3.6 - Ecosystem Upkeep Primitives](25673fd2-76cb-4c4d-8ec6-8c489207bcfc)."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.3.1",
+      "name": "Distribution Requirement Primitive",
+      "type": "Core",
+      "uuid": "c6ef4a5c-d6f4-42d6-8800-6b7a40e64f50",
+      "content": "The documents herein contain all data and specifications for Launch Agent 3’s Instance of the Distribution Requirement Primitive. See [A.2.3.6.1 - Distribution Requirement Primitive](0804ab13-d276-4ad9-a935-dc9f7fc2e350)."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.3.1.1",
+      "name": "Primitive Hub Document",
+      "type": "Core",
+      "uuid": "9beebf8b-dfd4-40b4-8de1-f5a3f4a60824",
+      "content": "The documents herein organize all base information relevant to Launch Agent 3’s usage of the Distribution Requirement Primitive."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.3.1.2.1.1.1",
+      "name": "Terms",
+      "type": "Core",
+      "uuid": "69b65ee6-746a-4d78-8d60-ec40ca2bb6b4",
+      "content": "Launch Agent 3 will buy back and distribute 0.25% of its total token supply per year."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.3.1.2.1.2.1.1",
+      "name": "Process Definition For Buy Back And Distribution Obligation",
+      "type": "Core",
+      "uuid": "e2db4ada-d8af-4481-963b-8ed8adfbd18d",
+      "content": "The process to buy back and distribute 0.25% of Launch Agent 3’s tokens per year will be specified in future iterations of the Launch Agent 3 Artifact."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.3.2",
+      "name": "Market Cap Fee Primitive",
+      "type": "Core",
+      "uuid": "73c34ab2-f346-4c19-8bfa-c96b8c528a54",
+      "content": "The documents herein contain all data and specifications for Launch Agent 3’s instances of the Market Cap Fee Primitive. See [A.2.3.6.2 - Market Cap Fee Primitive](a21616f4-1611-4e0b-87b2-efbdff9f6f28)."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.3.2.1",
+      "name": "Primitive Hub Document",
+      "type": "Core",
+      "uuid": "f7130548-974b-4c23-a3f6-677cb75250bc",
+      "content": "The documents herein organize all base information relevant to Launch Agent 3’s usage of the Market Cap Fee Primitive."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.3.3",
+      "name": "Upkeep Rebate Primitive",
+      "type": "Core",
+      "uuid": "dec47cc6-dce7-4256-bd23-6b659ae8bc25",
+      "content": "The documents herein contain all data and specifications for Launch Agent 3’s instance of the Upkeep Rebate Primitive. See [A.2.3.6.3 - Upkeep Rebate Primitive](569e1c2b-0e69-43e7-8491-06cc5f7d2988)."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.3.3.1",
+      "name": "Primitive Hub Document",
+      "type": "Core",
+      "uuid": "6952060d-f1dd-4d86-b2f8-f07090174d1d",
+      "content": "The documents herein organize all base information relevant to Launch Agent 3’s usage of the Upkeep Rebate Primitive."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.3.3.2.1.2.1.1",
+      "name": "Launch Agent 3 Holds Tokens Of Other Agents In Its SubProxy Account",
+      "type": "Core",
+      "uuid": "0d37e672-8a82-433c-a5c7-f88ff248cb6a",
+      "content": "Launch Agent 3 keeps all tokens of other Agents it holds in its SubProxy account."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.3.3.2.1.2.1.2",
+      "name": "Launch Agent 3 Deducts Rebate From Ecosystem Upkeep Fees",
+      "type": "Core",
+      "uuid": "d2a0b2dd-353f-46b1-ae2c-1791ce2a0b77",
+      "content": "When paying Ecosystem Upkeep fees, Launch Agent 3 deducts the rebate from the fees it pays."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.3.3.2.1.2.1.3",
+      "name": "Operational GovOps Reviews Rebate",
+      "type": "Core",
+      "uuid": "911e4409-146c-49e6-9f5c-5abdc58d97d3",
+      "content": "Operational GovOps reviews Launch Agent 3’s calculation of the rebate before executing a return of surplus to token holders. In the event of any issues, Operational GovOps cannot execute the distribution. If Operational GovOps does not execute the distribution, Operational GovOps must post an explanation on the Sky Forum under the “Launch Agent 3 Prime” category and work with Launch Agent 3 to resolve the disagreement. If Operational GovOps and Launch Agent 3 cannot resolve the disagreement, it must be escalated to Core GovOps."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.4",
+      "name": "SkyLink Primitives",
+      "type": "Core",
+      "uuid": "23b316a2-8a07-4295-808f-f787fea871de",
+      "content": "The documents herein implement the SkyLink Primitives for Launch Agent 3. See [A.2.3.7 - SkyLink Primitives](7b5d8965-a64c-4c44-b742-607f51f69d8f)."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.4.1",
+      "name": "Token SkyLink Primitive",
+      "type": "Core",
+      "uuid": "ddeb2ecf-ea5c-4087-a44d-0a69de3033f7",
+      "content": "The documents herein contain all data and specifications for Launch Agent 3’s Instances of the Token SkyLink Primitive. See [A.2.3.7.1 - Token SkyLink Primitive](4504d2d4-ee45-4a07-8c5b-9baf20b12e76)."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.4.1.1",
+      "name": "Primitive Hub Document",
+      "type": "Core",
+      "uuid": "052c7deb-75d9-4be2-aa45-cb3a59d14bd5",
+      "content": "The documents herein organize all base information relevant to Launch Agent 3’s usage of the Token SkyLink Primitive."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.5",
+      "name": "Demand Side Stablecoin Primitives",
+      "type": "Core",
+      "uuid": "6a390014-e5c9-4656-bdf8-587264a141cd",
+      "content": "The documents herein implement the Demand Side Stablecoin Primitives for Launch Agent 3. See [A.2.3.8 - Demand Side Stablecoin Primitives](26415305-432d-423b-9553-3f325279712d)."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.5.1",
+      "name": "Distribution Reward Primitive",
+      "type": "Core",
+      "uuid": "d8e61fc3-18a2-4952-8e5b-43cfb94b0bab",
+      "content": "The documents herein contain all data and specifications for Launch Agent 3’s instances of the Distribution Reward Primitive. See [A.2.3.8.1 - Distribution Reward Primitive](e632c38f-3e4e-4c7e-acfd-b6ec45a422e6)."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.5.1.1",
+      "name": "Primitive Hub Document",
+      "type": "Core",
+      "uuid": "10b6c6e8-edee-4a77-a6c4-bbb05db8b364",
+      "content": "The documents herein organize all base information relevant to Launch Agent 3’s usage of the Distribution Reward Primitive."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.5.1.1.2.1",
+      "name": "Launch Agent 3 Frontend App Instance Configuration Document Location",
+      "type": "Core",
+      "uuid": "ab7ff4b8-7e62-4a36-8573-581c86293e50",
+      "content": "This Instance’s associated Instance Configuration Document is located at [A.6.1.1.4.2.5.1.2.1 - Launch Agent 3 Frontend App Instance Configuration Document](b52f88c6-427b-45f6-8e1c-81fa27e522c8)."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.5.1.1.2.2",
+      "name": "Launch Agent 3 Frontend Open Source Widgets Instance Configuration Document Location",
+      "type": "Core",
+      "uuid": "43fbf9b3-7cf6-46f3-a900-c3ef9d193d02",
+      "content": "This Instance’s associated Instance Configuration Document is located at [A.6.1.1.4.2.5.1.2.2 - Launch Agent 3 Frontend Open Source Widgets Instance Configuration Document](5aada153-29f6-4304-b56e-9d425dc978a4)."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.5.1.2.1",
+      "name": "Launch Agent 3 Frontend App Instance Configuration Document",
+      "type": "Core",
+      "uuid": "b52f88c6-427b-45f6-8e1c-81fa27e522c8",
+      "content": "The documents herein contain the Instance Configuration Document for the Launch Agent 3 Frontend App Distribution Reward Primitive Instance."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.5.1.2.1.1",
+      "name": "Parameters",
+      "type": "Core",
+      "uuid": "5455497f-bfb3-49a0-a788-0b7db4da799b",
+      "content": "The documents herein define the parameters of the Launch Agent 3 Frontend App Instance of the Distribution Reward Primitive."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.5.1.2.1.1.3",
+      "name": "Custom Instance Parameters",
+      "type": "Core",
+      "uuid": "e5ff6cc4-c1d2-4184-a266-010104a6a28f",
+      "content": "The documents herein define the custom parameters of the Launch Agent 3 Frontend App Instance of the Distribution Reward Primitive, if any."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.5.1.2.1.2",
+      "name": "Operational Process Definition",
+      "type": "Core",
+      "uuid": "cb266ef8-782b-4bef-af06-be12b727b280",
+      "content": "The documents herein define the process for the ongoing management of the Launch Agent 3 Frontend App Instance of the Distribution Reward Primitive."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.5.1.2.1.2.1",
+      "name": "Routine Protocol",
+      "type": "Core",
+      "uuid": "bd3b25ac-90b8-49f0-ac29-bb51a2290820",
+      "content": "This document defines the protocol for routine ongoing management of the Launch Agent 3 Frontend App Instance. This Instance inherits the base class of operational logic defined in [A.2.3.8.1.2.4 - Instance Ongoing Management Protocol](3af0e156-b5c0-493b-bd6f-80185072b7b1), subject to the qualifications specified in [A.2.3.8.1.2.1.4.3.1 - Near-Term Process](05fb732b-de55-4886-81a7-7c5d4c13d2d2). \n\nModifications to the base operational logic automatically propagate to this Instance. In future iterations of the Launch Agent 3 Artifact, a version of the full process definition customized to Launch Agent 3 will be included herein."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.5.1.2.1.2.2",
+      "name": "Non-Routine Protocol",
+      "type": "Core",
+      "uuid": "eff49ccd-5874-41d9-aff0-3e3e2a348336",
+      "content": "The documents herein define the protocol for non-routine ongoing management of the Launch Agent 3 Frontend App Instance of this Distribution Reward Primitive."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.5.1.2.1.2.3",
+      "name": "Emergency Protocol",
+      "type": "Core",
+      "uuid": "d7296a92-3a38-42c3-938c-5327725b0fbb",
+      "content": "The documents herein define the protocol for handling emergency situations in the ongoing management of the Launch Agent 3 Frontend App Instance of this Distribution Reward Primitive."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.5.1.2.1.3",
+      "name": "Data Repository",
+      "type": "Core",
+      "uuid": "4ef496cf-201e-4a98-9f7e-e61ad7eebfd6",
+      "content": "The documents herein contain data relevant to the Launch Agent 3 Frontend App Instance of the Distribution Reward Primitive."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.5.1.2.1.3.4",
+      "name": "Distribution Reward Payments",
+      "type": "Active Data Controller",
+      "uuid": "8ece0051-0eee-427f-b2ea-1abfd52b80cd",
+      "content": "The Distribution Reward payments for the Launch Agent 3 Frontend App Instance of the Distribution Reward Primitive are defined as Active Data.\n\nThe Active Data is updated as follows:\n- The Responsible Party is Operational GovOps.\n- The Update Process must follow the protocol for ‘Direct Edit’."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.5.1.2.2",
+      "name": "Launch Agent 3 Frontend Open Source Widgets Instance Configuration Document",
+      "type": "Core",
+      "uuid": "5aada153-29f6-4304-b56e-9d425dc978a4",
+      "content": "The documents herein contain the Instance Configuration Document for the Launch Agent 3 Frontend Open Source Widgets Distribution Reward Primitive Instance."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.5.1.2.2.1",
+      "name": "Parameters",
+      "type": "Core",
+      "uuid": "159c7e99-c884-4496-aa9b-b7721be4849a",
+      "content": "The documents herein define the parameters of the Launch Agent 3 Frontend Open Source Widgets Instance of the Distribution Reward Primitive."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.5.1.2.2.1.3",
+      "name": "Custom Instance Parameters",
+      "type": "Core",
+      "uuid": "79e22741-ef2b-4b8e-b97c-acead4550deb",
+      "content": "The documents herein define the custom parameters of the Launch Agent 3 Frontend Open Source Widgets Instance of the Distribution Reward Primitive, if any."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.5.1.2.2.2",
+      "name": "Operational Process Definition",
+      "type": "Core",
+      "uuid": "4f94c1ee-d908-412a-b4c9-2f59e5bd4e67",
+      "content": "The documents herein define the process for the ongoing management of the Launch Agent 3 Frontend Open Source Widgets Instance of the Distribution Reward Primitive."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.5.1.2.2.2.1",
+      "name": "Routine Protocol",
+      "type": "Core",
+      "uuid": "461e8506-cc90-4c8d-9927-153ee996c432",
+      "content": "This document defines the protocol for routine ongoing management of the Launch Agent 3 Frontend Open Source Widgets Instance. This Instance inherits the base class of operational logic defined in [A.2.3.8.1.2.4 - Instance Ongoing Management Protocol](3af0e156-b5c0-493b-bd6f-80185072b7b1), subject to the qualifications specified in [A.2.3.8.1.2.1.4.3.1 - Near-Term Process](05fb732b-de55-4886-81a7-7c5d4c13d2d2). \n\nModifications to the base operational logic automatically propagate to this Instance. In future iterations of the Launch Agent 3 Artifact, a version of the full process definition customized to Launch Agent 3 will be included herein."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.5.1.2.2.2.2",
+      "name": "Non-Routine Protocol",
+      "type": "Core",
+      "uuid": "2ff3ed8b-6466-4a3d-87e0-040fb8940859",
+      "content": "The documents herein define the protocol for non-routine ongoing management of the Launch Agent 3 Frontend Open Source Widgets Instance of this Distribution Reward Primitive."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.5.1.2.2.2.3",
+      "name": "Emergency Protocol",
+      "type": "Core",
+      "uuid": "45f2cc2c-e96d-455f-808e-e188e5aece34",
+      "content": "The documents herein define the protocol for handling emergency situations in the ongoing management of the Launch Agent 3 Frontend Open Source Widgets Instance of this Distribution Reward Primitive."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.5.1.2.2.3",
+      "name": "Data Repository",
+      "type": "Core",
+      "uuid": "b198cdd7-92c2-4ff5-9f10-b0d315ed5f00",
+      "content": "The documents herein contain data relevant to the Launch Agent 3 Frontend Open Source Widgets Instance of the Distribution Reward Primitive."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.5.1.2.2.3.4",
+      "name": "Distribution Reward Payments",
+      "type": "Active Data Controller",
+      "uuid": "d96439a8-df0d-4ba9-973e-896fac953fad",
+      "content": "The Distribution Reward payments for the Launch Agent 3 Frontend Open Source Widgets Instance of the Distribution Reward Primitive are defined as Active Data.\n\nThe Active Data is updated as follows:\n- The Responsible Party is Operational GovOps.\n- The Update Process must follow the protocol for ‘Direct Edit’."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.5.1.2.3.2.1",
+      "name": "Routine Protocol",
+      "type": "Core",
+      "uuid": "de64fb0f-e867-495f-9e43-c197072e1c3d",
+      "content": "This document defines the protocol for routine ongoing management of the Summer.fi Instance. This Instance inherits the base class of operational logic defined in [A.2.3.8.1.2.4 - Instance Ongoing Management Protocol](3af0e156-b5c0-493b-bd6f-80185072b7b1), subject to the qualifications specified in [A.2.3.8.1.2.1.4.3.1 - Near-Term Process](05fb732b-de55-4886-81a7-7c5d4c13d2d2). \n\nModifications to the base operational logic automatically propagate to this Instance. In future iterations of the Launch Agent 3 Artifact, a version of the full process definition customized to Launch Agent 3 will be included herein."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.5.1.2.3.3.5",
+      "name": "Third Party Partner Payment Addresses And Transaction Records",
+      "type": "Active Data Controller",
+      "uuid": "73fc6f80-ac05-423f-ac58-e22dbfa8de3f",
+      "content": "This Document records information pertaining to Launch Agent 3’s payments to the Third Party Partner associated with this Instance. This information is defined as Active Data.\n\nThe Active Data is updated as follows:\n- The Responsible Party is Operational GovOps.\n- The Update Process must follow the protocol for ‘Direct Edit’."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.5.1.2.4.2.1",
+      "name": "Routine Protocol",
+      "type": "Core",
+      "uuid": "2e0cdaa7-5d3a-42c2-808d-220c4823c0e2",
+      "content": "This document defines the protocol for routine ongoing management of the DeFi Saver Instance. This Instance inherits the base class of operational logic defined in This Instance inherits the base class of operational logic defined in [A.2.3.8.1.2.4 - Instance Ongoing Management Protocol](3af0e156-b5c0-493b-bd6f-80185072b7b1), subject to the qualifications specified in [A.2.3.8.1.2.1.4.3.1 - Near-Term Process](05fb732b-de55-4886-81a7-7c5d4c13d2d2). \n\nModifications to the base operational logic automatically propagate to this Instance. In future iterations of the Launch Agent 3 Artifact, a version of the full process definition customized to Launch Agent 3 will be included herein."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.5.1.2.4.3.5",
+      "name": "Third Party Partner Payment Addresses And Transaction Records",
+      "type": "Active Data Controller",
+      "uuid": "e2a262ce-e59a-421c-ab32-803fe41802c4",
+      "content": "This Document records information pertaining to Launch Agent 3’s payments to the Third Party Partner associated with this Instance. This information is defined as Active Data.\n\nThe Active Data is updated as follows:\n- The Responsible Party is Operational GovOps.\n- The Update Process must follow the protocol for ‘Direct Edit’."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.5.1.2.4.3.5.0.6.2",
+      "name": "Third Party Partner Payment Addresses",
+      "type": "Active Data",
+      "uuid": "da35cd2c-4113-4656-a5f5-5b804b5f894f",
+      "content": "The payment address of this Third Party Partner will be defined in a future iteration of the Launch Agent 3 Artifact."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.5.1.2.5.2.1",
+      "name": "Routine Protocol",
+      "type": "Core",
+      "uuid": "c6e84f25-85fe-412e-808a-235e713d4ec2",
+      "content": "This document defines the protocol for routine ongoing management of the CoW Swap Instance. This Instance inherits the base class of operational logic defined in This Instance inherits the base class of operational logic defined in [A.2.3.8.1.2.4 - Instance Ongoing Management Protocol](3af0e156-b5c0-493b-bd6f-80185072b7b1), subject to the qualifications specified in [A.2.3.8.1.2.1.4.3.1 - Near-Term Process](05fb732b-de55-4886-81a7-7c5d4c13d2d2). \n\nModifications to the base operational logic automatically propagate to this Instance. In future iterations of the Launch Agent 3 Artifact, a version of the full process definition customized to Launch Agent 3 will be included herein."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.5.1.2.5.3.5",
+      "name": "Third Party Partner Payment Addresses And Transaction Records",
+      "type": "Active Data Controller",
+      "uuid": "84df5c1e-86b7-431d-bb0e-8708f99a572e",
+      "content": "This Document records information pertaining to Launch Agent 3’s payments to the Third Party Partner associated with this Instance. This information is defined as Active Data.\n\nThe Active Data is updated as follows:\n- The Responsible Party is Operational GovOps.\n- The Update Process must follow the protocol for ‘Direct Edit’."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.5.1.2.6.2.1",
+      "name": "Routine Protocol",
+      "type": "Core",
+      "uuid": "bf955649-4ac2-45e2-8376-052e884698e4",
+      "content": "This document defines the protocol for routine ongoing management of the ParaSwap Instance. This Instance inherits the base class of operational logic defined in [A.2.3.8.1.2.4 - Instance Ongoing Management Protocol](3af0e156-b5c0-493b-bd6f-80185072b7b1), subject to the qualifications specified in [A.2.3.8.1.2.1.4.3.1 - Near-Term Process](05fb732b-de55-4886-81a7-7c5d4c13d2d2). \n\nModifications to the base operational logic automatically propagate to this Instance. In future iterations of the Launch Agent 3 Artifact, a version of the full process definition customized to Launch Agent 3 will be included herein."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.5.1.2.6.3.5",
+      "name": "Third Party Partner Payment Addresses And Transaction Records",
+      "type": "Active Data Controller",
+      "uuid": "81bafe53-8c66-43ec-82fd-5848b9d64555",
+      "content": "This Document records information pertaining to Launch Agent 3’s payments to the Third Party Partner associated with this Instance. This information is defined as Active Data.\n\nThe Active Data is updated as follows:\n- The Responsible Party is Operational GovOps.\n- The Update Process must follow the protocol for ‘Direct Edit’."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.5.1.2.6.3.5.0.6.2",
+      "name": "Third Party Partner Payment Addresses",
+      "type": "Active Data",
+      "uuid": "8088e4e4-a594-448c-a3cb-752b907b4f3c",
+      "content": "The payment address of this Third Party Partner will be defined in a future iteration of the Launch Agent 3 Artifact."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.5.1.2.7.2.1",
+      "name": "Routine Protocol",
+      "type": "Core",
+      "uuid": "1c93fd6d-5cff-46e7-86e5-0af4f6c83b4b",
+      "content": "This document defines the protocol for routine ongoing management of the Yearn (Gimme) Instance. This Instance inherits the base class of operational logic defined in [A.2.3.8.1.2.4 - Instance Ongoing Management Protocol](3af0e156-b5c0-493b-bd6f-80185072b7b1), subject to the qualifications specified in [A.2.3.8.1.2.1.4.3.1 - Near-Term Process](05fb732b-de55-4886-81a7-7c5d4c13d2d2). \n\nModifications to the base operational logic automatically propagate to this Instance. In future iterations of the Launch Agent 3 Artifact, a version of the full process definition customized to Launch Agent 3 will be included herein."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.5.1.2.7.3.5",
+      "name": "Third Party Partner Payment Addresses And Transaction Records",
+      "type": "Active Data Controller",
+      "uuid": "690e54dd-c88a-422e-a06d-e6812035fc1c",
+      "content": "This Document records information pertaining to Launch Agent 3’s payments to the Third Party Partner associated with this Instance. This information is defined as Active Data.\n\nThe Active Data is updated as follows:\n- The Responsible Party is Operational GovOps.\n- The Update Process must follow the protocol for ‘Direct Edit’."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.5.1.2.8.2.1",
+      "name": "Routine Protocol",
+      "type": "Core",
+      "uuid": "4b22e820-db7b-4f76-8b82-6f60b21ca1d9",
+      "content": "This document defines the protocol for routine ongoing management of the MOM Instance. This Instance inherits the base class of operational logic defined in [A.2.3.8.1.2.4 - Instance Ongoing Management Protocol](3af0e156-b5c0-493b-bd6f-80185072b7b1), subject to the qualifications specified in [A.2.3.8.1.2.1.4.3.1 - Near-Term Process](05fb732b-de55-4886-81a7-7c5d4c13d2d2). \n\nModifications to the base operational logic automatically propagate to this Instance. In future iterations of the Launch Agent 3 Artifact, a version of the full process definition customized to Launch Agent 3 will be included herein."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.5.1.2.8.3.5",
+      "name": "Third Party Partner Payment Addresses And Transaction Records",
+      "type": "Active Data Controller",
+      "uuid": "74b0e9af-0a6d-4cfc-988a-5621713772fc",
+      "content": "This Document records information pertaining to Launch Agent 3’s payments to the Third Party Partner associated with this Instance. This information is defined as Active Data.\n\nThe Active Data is updated as follows:\n- The Responsible Party is Operational GovOps.\n- The Update Process must follow the protocol for ‘Direct Edit’."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.5.1.2.8.3.5.0.6.2",
+      "name": "Third Party Partner Payment Addresses",
+      "type": "Active Data",
+      "uuid": "4fc18aff-0fd6-41ea-a5e8-92ea54861c99",
+      "content": "The payment address of this Third Party Partner will be defined in a future iteration of the Launch Agent 3 Artifact."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.5.1.4.1.2.2",
+      "name": "Tracking Methodology",
+      "type": "Core",
+      "uuid": "98906b92-72db-4f7e-ac79-053a92728025",
+      "content": "This parameter will be defined in a future iteration of the Launch Agent 3 Artifact."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.5.1.4.1.3.1",
+      "name": "Routine Protocol",
+      "type": "Core",
+      "uuid": "02c6ffc8-5fdc-4a1f-8037-a6a1aeb5e51c",
+      "content": "This document defines the protocol for routine ongoing management of the MetaMask Instance. This Instance inherits the base class of operational logic defined in [A.2.3.8.1.2.4 - Instance Ongoing Management Protocol](3af0e156-b5c0-493b-bd6f-80185072b7b1), subject to the qualifications specified in [A.2.3.8.1.2.1.4.3.1 - Near-Term Process](05fb732b-de55-4886-81a7-7c5d4c13d2d2). \n\nModifications to the base operational logic automatically propagate to this Instance. In future iterations of the Launch Agent 3 Artifact, a version of the full process definition customized to Launch Agent 3 will be included herein."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.5.1.4.1.4.5",
+      "name": "Third Party Partner Payment Addresses And Transaction Records",
+      "type": "Active Data Controller",
+      "uuid": "ded05ed5-e470-4cbc-b3f0-c7d8cd928584",
+      "content": "This Document records information pertaining to Launch Agent 3’s payments to the Third Party Partner associated with this Instance. This information is defined as Active Data.\n\nThe Active Data is updated as follows:\n- The Responsible Party is Operational GovOps.\n- The Update Process must follow the protocol for ‘Direct Edit’."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.5.1.4.1.4.5.0.6.2",
+      "name": "Third Party Partner Payment Addresses",
+      "type": "Active Data",
+      "uuid": "b537c8e2-92b6-4d2f-88ff-337acb1e8357",
+      "content": "The payment address of this Third Party Partner will be defined in a future iteration of the Launch Agent 3 Artifact."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.5.1.4.2.2.2",
+      "name": "Tracking Methodology",
+      "type": "Core",
+      "uuid": "1dcac5c2-21ec-4714-bf77-f861a851aec4",
+      "content": "This parameter will be defined in a future iteration of the Launch Agent 3 Artifact."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.5.1.4.2.3.1",
+      "name": "Routine Protocol",
+      "type": "Core",
+      "uuid": "c458078b-ffba-428e-950a-9c20a64967d4",
+      "content": "This document defines the protocol for routine ongoing management of the InstaDapp Instance. This Instance inherits the base class of operational logic defined in [A.2.3.8.1.2.4 - Instance Ongoing Management Protocol](3af0e156-b5c0-493b-bd6f-80185072b7b1), subject to the qualifications specified in [A.2.3.8.1.2.1.4.3.1 - Near-Term Process](05fb732b-de55-4886-81a7-7c5d4c13d2d2). \n\nModifications to the base operational logic automatically propagate to this Instance. In future iterations of the Launch Agent 3 Artifact, a version of the full process definition customized to Launch Agent 3 will be included herein."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.5.1.4.2.4.5",
+      "name": "Third Party Partner Payment Addresses And Transaction Records",
+      "type": "Active Data Controller",
+      "uuid": "28b69d1f-44d3-4b97-8aff-809513145245",
+      "content": "This Document records information pertaining to Launch Agent 3’s payments to the Third Party Partner associated with this Instance. This information is defined as Active Data.\n\nThe Active Data is updated as follows:\n- The Responsible Party is Operational GovOps.\n- The Update Process must follow the protocol for ‘Direct Edit’."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.5.1.4.2.4.5.0.6.2",
+      "name": "Third Party Partner Payment Addresses",
+      "type": "Active Data",
+      "uuid": "1438c4e7-e15b-443c-b9c6-dcdde63920c6",
+      "content": "The payment address of this Third Party Partner will be defined in a future iteration of the Launch Agent 3 Artifact."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.5.1.4.3.2.2",
+      "name": "Tracking Methodology",
+      "type": "Core",
+      "uuid": "07ec38da-a0ca-468e-83b7-2059ad5e4016",
+      "content": "This parameter will be defined in a future iteration of the Launch Agent 3 Artifact."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.5.1.4.3.3.1",
+      "name": "Routine Protocol",
+      "type": "Core",
+      "uuid": "34d65ab5-5a03-42a6-848d-ace67c5e9ab0",
+      "content": "This document defines the protocol for routine ongoing management of the Gnosis Protocol Instance. This Instance inherits the base class of operational logic defined in [A.2.3.8.1.2.4 - Instance Ongoing Management Protocol](3af0e156-b5c0-493b-bd6f-80185072b7b1), subject to the qualifications specified in [A.2.3.8.1.2.1.4.3.1 - Near-Term Process](05fb732b-de55-4886-81a7-7c5d4c13d2d2). \n\nModifications to the base operational logic automatically propagate to this Instance. In future iterations of the Launch Agent 3 Artifact, a version of the full process definition customized to Launch Agent 3 will be included herein."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.5.1.4.3.4.5",
+      "name": "Third Party Partner Payment Addresses And Transaction Records",
+      "type": "Active Data Controller",
+      "uuid": "efbea98b-9063-4706-a467-050eb2594339",
+      "content": "This Document records information pertaining to Launch Agent 3’s payments to the Third Party Partner associated with this Instance. This information is defined as Active Data.\n\nThe Active Data is updated as follows:\n- The Responsible Party is Operational GovOps.\n- The Update Process must follow the protocol for ‘Direct Edit’."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.5.1.4.3.4.5.0.6.2",
+      "name": "Third Party Partner Payment Addresses",
+      "type": "Active Data",
+      "uuid": "802462c0-d9d1-42fa-8729-54135634f7f5",
+      "content": "The payment address of this Third Party Partner will be defined in a future iteration of the Launch Agent 3 Artifact."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.5.1.4.4.2.2",
+      "name": "Tracking Methodology",
+      "type": "Core",
+      "uuid": "2785cf23-1be4-4c83-b50e-be57a30c1a79",
+      "content": "This parameter will be defined in a future iteration of the Launch Agent 3 Artifact."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.5.1.4.4.3.1",
+      "name": "Routine Protocol",
+      "type": "Core",
+      "uuid": "a08670ae-0bc5-4424-9b65-38db64441e8d",
+      "content": "This document defines the protocol for routine ongoing management of the Piku.co Instance. This Instance inherits the base class of operational logic defined in [A.2.3.8.1.2.4 - Instance Ongoing Management Protocol](3af0e156-b5c0-493b-bd6f-80185072b7b1), subject to the qualifications specified in [A.2.3.8.1.2.1.4.3.1 - Near-Term Process](05fb732b-de55-4886-81a7-7c5d4c13d2d2). \n\nModifications to the base operational logic automatically propagate to this Instance. In future iterations of the Launch Agent 3 Artifact, a version of the full process definition customized to Launch Agent 3 will be included herein."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.5.1.4.4.4.5",
+      "name": "Third Party Partner Payment Addresses And Transaction Records",
+      "type": "Active Data Controller",
+      "uuid": "55ab7dfa-57e5-49d2-9dc3-05b0bfe14d04",
+      "content": "This Document records information pertaining to Launch Agent 3’s payments to the Third Party Partner associated with this Instance. This information is defined as Active Data.\n\nThe Active Data is updated as follows:\n- The Responsible Party is Operational GovOps.\n- The Update Process must follow the protocol for ‘Direct Edit’."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.5.1.4.4.4.5.0.6.2",
+      "name": "Third Party Partner Payment Addresses",
+      "type": "Active Data",
+      "uuid": "49aa9d18-aa7e-464d-a965-f56fd014c02f",
+      "content": "The payment address of this Third Party Partner will be defined in a future iteration of the Launch Agent 3 Artifact."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.5.1.4.5.2.2",
+      "name": "Tracking Methodology",
+      "type": "Core",
+      "uuid": "9d2d053d-6ae2-4a9d-b5eb-e1b3457e1524",
+      "content": "This parameter will be defined in a future iteration of the Launch Agent 3 Artifact."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.5.1.4.5.3.1",
+      "name": "Routine Protocol",
+      "type": "Core",
+      "uuid": "d085cb25-fc4a-41e2-92ed-26cba7585978",
+      "content": "This document defines the protocol for routine ongoing management of the Lazy Summer Protocol Instance. This Instance inherits the base class of operational logic defined in [A.2.3.8.1.2.4 - Instance Ongoing Management Protocol](3af0e156-b5c0-493b-bd6f-80185072b7b1), subject to the qualifications specified in [A.2.3.8.1.2.1.4.3.1 - Near-Term Process](05fb732b-de55-4886-81a7-7c5d4c13d2d2).\n\nModifications to the base operational logic automatically propagate to this Instance. In future iterations of the Launch Agent 3 Artifact, a version of the full process definition customized to Launch Agent 3 will be included herein."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.5.1.4.5.4.5",
+      "name": "Third Party Partner Payment Addresses And Transaction Records",
+      "type": "Active Data Controller",
+      "uuid": "034f992e-bca4-4d38-ae9d-1f6ae2f0c048",
+      "content": "This Document records information pertaining to Launch Agent 3’s payments to the Third Party Partner associated with this Instance. This information is defined as Active Data.\n\nThe Active Data is updated as follows:\n- The Responsible Party is Operational GovOps.\n- The Update Process must follow the protocol for ‘Direct Edit’."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.5.1.4.5.4.5.0.6.2",
+      "name": "Third Party Partner Payment Addresses",
+      "type": "Active Data",
+      "uuid": "e1c26bc8-3578-40d7-9f33-8d0e6a24c5e5",
+      "content": "The payment address of this Third Party Partner will be defined in a future iteration of the Launch Agent 3 Artifact."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.5.2",
+      "name": "Integration Boost Primitive",
+      "type": "Core",
+      "uuid": "460cd7ec-5947-4f16-bc6e-de5db7c7a139",
+      "content": "The documents herein contain all data and specifications for Launch Agent 3’s Instances of the Integration Boost Primitive. See [A.2.3.8.2 - Integration Boost Primitive](73577399-62e4-4a83-ae11-64ef7e7b7f20)."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.5.2.1",
+      "name": "Primitive Hub Document",
+      "type": "Core",
+      "uuid": "4d0912c0-d103-43b2-a6bd-c764b83436ec",
+      "content": "The documents herein organize all base information relevant to Launch Agent 3’s usage of the Integration Boost Primitive."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.5.2.2.1.2.1",
+      "name": "Routine Protocol",
+      "type": "Core",
+      "uuid": "6fe71ca8-3c28-408e-8b11-3c2fcfcc5778",
+      "content": "This document defines the protocol for routine ongoing management of the Euler Instance. This Instance inherits the base class of operational logic defined in [A.2.3.8.2.2.4 - Instance Ongoing Management Protocol](805381e5-89e7-4fb9-bda7-a97e84b531ba), subject to the qualifications specified in [A.2.3.8.2.2.1.3.2.1 - Near Term Process](4ab621b4-ef8e-4b01-a6aa-9296601033c5). \n\nModifications to the base operational logic automatically propagate to this Instance. In future iterations of the Launch Agent 3 Artifact, a version of the full process definition customized to Launch Agent 3 will be included herein."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.5.2.4.1.3.1",
+      "name": "Routine Protocol",
+      "type": "Core",
+      "uuid": "9ad35e12-7bd0-46c8-a753-4a341ab880a2",
+      "content": "This document defines the protocol for routine ongoing management of the Compound Instance. This Instance inherits the base class of operational logic defined in [A.2.3.8.2.2.4 - Instance Ongoing Management Protocol](805381e5-89e7-4fb9-bda7-a97e84b531ba), subject to the qualifications specified in [A.2.3.8.2.2.1.3.2.1 - Near Term Process](4ab621b4-ef8e-4b01-a6aa-9296601033c5). \n\nModifications to the base operational logic automatically propagate to this Instance. In future iterations of the Launch Agent 3 Artifact, a version of the full process definition customized to Launch Agent 3 will be included herein."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.5.3",
+      "name": "Pioneer Chain Primitive",
+      "type": "Core",
+      "uuid": "d096b01c-84a2-44a5-9af6-8888a825e0d4",
+      "content": "The documents herein contain all data and specifications for Launch Agent 3’s Instances of the Pioneer Chain Primitive. See [A.2.3.8.3 - Pioneer Chain Primitive](4c7be4c6-44b5-407a-94ae-3d7ca7e8039c)."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.5.3.1",
+      "name": "Primitive Hub Document",
+      "type": "Core",
+      "uuid": "a5890268-5a4c-4b8c-890a-6db09c71aced",
+      "content": "The documents herein organize all base information relevant to Launch Agent 3’s usage of the Pioneer Chain Primitive."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.6",
+      "name": "Supply Side Stablecoin Primitives",
+      "type": "Core",
+      "uuid": "b58a8d96-b6df-416e-b81f-2898d82924b4",
+      "content": "The documents herein implement the Supply Side Stablecoin Primitives for Launch Agent 3. See [A.2.3.9 - Supply Side Stablecoin Primitives](d1142876-33c2-4e21-9339-d8711525d46f)."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.6.1",
+      "name": "Allocation System Primitive",
+      "type": "Core",
+      "uuid": "24b63123-f30f-4dc3-aefa-74b4351c4baa",
+      "content": "The documents herein contain all data and specifications for Launch Agent 3’s Instances of the Allocation System Primitive. See [A.2.3.9.1 - Allocation System Primitive](9db14ab7-bb4b-4751-8084-843bd4359f2a)."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.6.1.1",
+      "name": "Primitive Hub Document",
+      "type": "Core",
+      "uuid": "72950044-a7ba-44bf-9910-1e655bfbbb76",
+      "content": "The documents herein organize all base information relevant to Launch Agent 3’s usage of the Allocation System Primitive."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.6.2",
+      "name": "Junior Risk Capital Rental Primitive",
+      "type": "Core",
+      "uuid": "09144d1a-2cda-4805-b50d-b3da4f09d48b",
+      "content": "The documents herein contain all data and specifications for Launch Agent 3’s Instances of the Junior Risk Capital Rental Primitive. See [A.2.3.9.2 - Junior Risk Capital Rental Primitive](d8086dc0-7e77-4c6b-98c7-5fc41337a1ce)."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.6.2.1",
+      "name": "Primitive Hub Document",
+      "type": "Core",
+      "uuid": "16bf9c06-af9f-4853-bf8b-5246ada6e580",
+      "content": "The documents herein organize all base information relevant to Launch Agent 3’s usage of the Junior Risk Capital Rental Primitive."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.6.3",
+      "name": "Asset Liability Management Rental Primitive",
+      "type": "Core",
+      "uuid": "c2f8c143-52a9-41a5-be4a-05c07ca64f6b",
+      "content": "The documents herein contain all data and specifications for Launch Agent 3’s Instances of the Asset Liability Management Rental Primitive. See [A.2.3.9.3 - Asset Liability Management Rental Primitive](bd1f1ce5-6c31-42fc-a2aa-694acf5eb08c)."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.6.3.1",
+      "name": "Primitive Hub Document",
+      "type": "Core",
+      "uuid": "23300804-de11-4f5d-a28f-bc7995b36165",
+      "content": "The documents herein organize all base information relevant to Launch Agent 3’s usage of the Asset Liability Management Rental Primitive."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.7",
+      "name": "Core Governance Primitives",
+      "type": "Core",
+      "uuid": "095cc4f1-a097-4157-8e81-06031208c39f",
+      "content": "The documents herein implement the Core Governance Primitives for Launch Agent 3. See [A.2.3.10 - Core Governance Primitives](6fa54611-c744-4b9d-897d-b2a20e9cae5d)."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.7.1",
+      "name": "Core Governance Reward Primitive",
+      "type": "Core",
+      "uuid": "79b5a43d-1abe-4945-9f7d-7fa8a5ac182e",
+      "content": "The documents herein contain all data and specifications for Launch Agent 3’s Instances of the Core Governance Reward Primitive. See [A.2.3.10.1 - Core Governance Reward Primitive](b22d1c08-042a-4466-94fe-9d28951e4d4a)."
+    },
+    {
+      "doc_no": "A.6.1.1.4.2.7.1.1",
+      "name": "Primitive Hub Document",
+      "type": "Core",
+      "uuid": "58a4cf93-5c1c-4fec-8c5b-2c1c6f167c72",
+      "content": "The documents herein organize all base information relevant to Launch Agent 3’s usage of the Core Governance Reward Primitive."
+    },
+    {
+      "doc_no": "A.6.1.1.4.3",
+      "name": "Omni Documents",
+      "type": "Core",
+      "uuid": "12153a95-5be4-4f5e-8d04-d3046ad9b7bc",
+      "content": "The documents herein define Launch Agent 3’s strategic intent and operational processes relating to infrastructure inherited from Sky Core, activities unrelated to Sky Primitives, or activities spanning multiple Sky Primitives."
+    },
+    {
+      "doc_no": "A.6.1.1.4.3.1",
+      "name": "Governance Information Unrelated To Root Edit Primitive",
+      "type": "Core",
+      "uuid": "70804058-8a1b-45ee-bf21-b09a5daefdb9",
+      "content": "The documents herein specify Launch Agent 3 governance information that is unrelated to the use of the Root Edit Primitive. The governance process for updating the Launch Agent 3 Artifact is specified in the Root Edit Primitive above at [A.6.1.1.4.2.2.2 - Root Edit Primitive](24517c43-dec9-44ec-bc03-e76671dc2e74)."
+    },
+    {
+      "doc_no": "A.6.1.1.4.3.1.1",
+      "name": "Sky Forum",
+      "type": "Core",
+      "uuid": "0d482d6a-f140-4798-bf9c-a0c6cb5a2aa5",
+      "content": "Launch Agent 3 uses the Sky Forum for governance-related discussion. Posts should use the “Launch Agent 3 Prime” category."
+    },
+    {
+      "doc_no": "A.6.1.1.4.3.1.2",
+      "name": "Sky Ecosystem Emergency Response",
+      "type": "Core",
+      "uuid": "31f5b013-30a1-4135-8e04-4e9b7ee6a794",
+      "content": "The documents herein specify Launch Agent 3’s emergency response protocol in situations that impact the entire Sky Ecosystem. This protocol will be specified in a future iteration of the Launch Agent 3 Artifact."
+    },
+    {
+      "doc_no": "A.6.1.1.4.3.1.3",
+      "name": "Agent-Specific Emergency Response",
+      "type": "Core",
+      "uuid": "dedeb7e0-af9d-41ef-aec2-cdfb8b3fc437",
+      "content": "The documents herein specify Launch Agent 3’s emergency response protocol in situations solely impacting Launch Agent 3 versus the broader Sky Ecosystem. This protocol will be specified in a future iteration of the Launch Agent 3 Artifact."
+    },
+    {
+      "doc_no": "A.6.1.1.4.3.2",
+      "name": "Sky Primitives Strategy",
+      "type": "Core",
+      "uuid": "8bc018e0-e343-424e-9089-6a813d168dff",
+      "content": "The documents herein define Launch Agent 3’s strategic intent with respect to certain Sky Primitives."
+    },
+    {
+      "doc_no": "A.6.1.1.4.3.2.1",
+      "name": "Distribution Reward Strategy",
+      "type": "Core",
+      "uuid": "825f23f7-739b-4a76-8e23-540b11f1854c",
+      "content": "Launch Agent 3’s strategy with respect to the Distribution Reward Primitive is to encourage the broad adoption of USDS by bridging into new communities and DeFi platforms, thereby earning and distributing Distribution Rewards for USDS balances facilitated through its frontend. Prospective partners should demonstrate strong alignment with Launch Agent 3’s mission, and offer clear pathways to engage new user bases and support the sustainable growth of USDS across diverse ecosystems.\n\nThe guiding criteria are as follows:\n- **Shared Mission Alignment:** Partners must demonstrate a commitment to promoting user-friendly stablecoin usage and responsible financial empowerment.\n- **Clear Synergy:** The collaboration should enhance USDS accessibility, by offering either a unique distribution channel or a robust incentive model. \n- **Community Benefit**: Proposed partnerships should deliver tangible rewards or advantages that resonate with Sky’s user base. \n- **Scalability & Compliance: **Potential integrations should have the capacity to handle increased demand and adhere to the risk management guidelines described in the Atlas."
+    },
+    {
+      "doc_no": "A.6.1.1.4.3.2.2",
+      "name": "Integration Boost Strategy",
+      "type": "Core",
+      "uuid": "8b587f01-c678-4f6d-ba37-a0765f5657b0",
+      "content": "Launch Agent 3’s strategy with respect to the Integration Boost Primitive is to deliver a “Sky Savings Rate” (or similar program) to USDS users across selected DeFi platforms. This approach aims to extend the reach of USDS by tapping into fresh communities and expanding its overall market presence.  New collaborations should exhibit compatibility with Launch Agent 3’s accessibility ethos, showcase steady on-chain activity, and present clear opportunities to onboard broader user segments into the Launch Agent 3 ecosystem.\n\nThe guiding criteria are as follows:\n- **Long-Term Viability: **Target platforms must exhibit strong on-chain activity and a track record of stability.\n- **Aligned Incentives:** Collaborations should offer meaningful yield enhancements that support the broader Sky mission.\n- **Growth Potential:** Partners must show clear prospects for sustainable scaling, ensuring that users can benefit from ongoing improvements."
+    },
+    {
+      "doc_no": "A.6.1.1.4.3.2.3",
+      "name": "Core Governance Reward Strategy",
+      "type": "Core",
+      "uuid": "276d8421-4f07-4ac5-812d-88909b5a9ecd",
+      "content": "Launch Agent 3’s strategy with respect to the Core Governance Reward Primitive is to provide continuous, secure, and user-friendly governance frontend hosting for SKY holders, ensuring critical decision-making processes remain accessible and reliable over time.\n\nThe guiding criteria are as follows:\n- **Security & Reliability: **The Prime Agent will uphold robust security measures and maintain high availability to prevent disruptions or unauthorized access.\n- **Governance Framework Alignment:** Any updates to the frontend should integrate smoothly with Launch Agent 3’s existing governance mechanisms, preserving uninterrupted voting and proposal workflows."
+    }
+  ]
+}
