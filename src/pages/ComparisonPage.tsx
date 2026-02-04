@@ -1,27 +1,56 @@
-import { useState, useEffect } from 'react';
-import { Container, Title, Text, Loader, Center, Box, Group, Button, Checkbox } from '@mantine/core';
+import { useState, useEffect, useCallback } from 'react';
+import { Title, Text, Loader, Center, Box, Group, Button, Checkbox } from '@mantine/core';
 import { IconDownload, IconTrash } from '@tabler/icons-react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { AgentComparisonAligned } from '../AgentComparisonAligned';
 import type { AtlasNode } from '../types';
 import { loadComparisonAgents, type AgentInfo } from '../utils/dataLoader';
 import { substituteVariablesPlain } from '../utils/substitutionUtils';
 
+/**
+ * Parse doc_no from URL hash
+ * Supports: #A.6.1.1.5.2.6
+ */
+const parseDocNoFromHash = (hash: string): string | null => {
+  if (!hash) return null;
+  // Remove leading #
+  const value = hash.startsWith('#') ? hash.slice(1) : hash;
+  if (!value) return null;
+
+  // Check if it's a valid doc_no
+  if (/^A\.[0-9.]+$/.test(value)) {
+    return value;
+  }
+
+  return null;
+};
+
 export function ComparisonPage() {
+  const location = useLocation();
+  const navigate = useNavigate();
+
   const [comparisonAgents, setComparisonAgents] = useState<AgentInfo[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  // Initialize empty - will be populated when agents load
   const [visibleAgents, setVisibleAgents] = useState<Record<string, boolean>>({
-    Spark: true,
-    Grove: true,
-    Keel: true,
-    'Launch Agent 3': true,
-    'Obex': true,
-    'Launch Agent 5': true,
     Builder: true,
   });
   const [selectedSections, setSelectedSections] = useState<
     Record<string, { agentName: string; node: AtlasNode }>
   >({});
+
+  // Get initial doc_no from URL hash
+  const [initialDocNo] = useState(() => parseDocNoFromHash(location.hash));
+
+  // Handle navigation updates (update URL when user searches)
+  const handleNavigate = useCallback((docNo: string | null) => {
+    if (docNo) {
+      navigate(`#${docNo}`, { replace: true });
+    } else {
+      navigate(location.pathname, { replace: true });
+    }
+  }, [navigate, location.pathname]);
 
   // Builder variables
   const [builderAgentName, setBuilderAgentName] = useState<string>('');
@@ -75,6 +104,14 @@ export function ComparisonPage() {
     loadComparisonAgents()
       .then((agents) => {
         setComparisonAgents(agents);
+
+        // Initialize visibility for all loaded agents (using names from Atlas)
+        const initialVisibility: Record<string, boolean> = { Builder: true };
+        agents.forEach((agent) => {
+          initialVisibility[agent.name] = true;
+        });
+        setVisibleAgents(initialVisibility);
+
         setLoading(false);
 
         // Load Builder state from localStorage
@@ -206,18 +243,18 @@ export function ComparisonPage() {
   }
 
   return (
-    <Container size="100%" py="xl" px="xs">
-      <Box mb="xl">
-        <Title order={1} mb="xs">
-          Agent Comparison
-        </Title>
-        <Text c="dimmed" size="sm">
-          Compare agent structures and build custom agents
-        </Text>
-      </Box>
+    <Box style={{ height: 'calc(100vh - 60px)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+      <Box py="md" px="xs">
+        <Box mb="md">
+          <Title order={1} mb="xs">
+            Agent Comparison
+          </Title>
+          <Text c="dimmed" size="sm">
+            Compare agent structures and build custom agents
+          </Text>
+        </Box>
 
-      {comparisonAgents.length === 6 && (
-        <>
+        {comparisonAgents.length > 0 && (
           <Box mb="md">
             <Group justify="center" mb="sm">
               {comparisonAgents.map((agent) => (
@@ -271,6 +308,11 @@ export function ComparisonPage() {
               </Button>
             </Group>
           </Box>
+        )}
+      </Box>
+
+      {comparisonAgents.length > 0 && (
+        <Box style={{ flex: 1, overflow: 'auto', paddingLeft: 8, paddingRight: 8 }}>
           <AgentComparisonAligned
             agents={comparisonAgents.filter((agent) => visibleAgents[agent.name])}
             selectedSections={selectedSections}
@@ -279,6 +321,8 @@ export function ComparisonPage() {
             builderAgentName={builderAgentName}
             builderTokenSymbol={builderTokenSymbol}
             builderSubproxyAccount={builderSubproxyAccount}
+            initialDocNo={initialDocNo || undefined}
+            onNavigate={handleNavigate}
             onBuilderAgentNameChange={setBuilderAgentName}
             onBuilderTokenSymbolChange={setBuilderTokenSymbol}
             onBuilderSubproxyAccountChange={setBuilderSubproxyAccount}
@@ -288,8 +332,8 @@ export function ComparisonPage() {
             customEdits={customEdits}
             onCustomEditsChange={setCustomEdits}
           />
-        </>
+        </Box>
       )}
-    </Container>
+    </Box>
   );
 }

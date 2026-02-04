@@ -22,7 +22,7 @@ function SceneContent({ controlsRef, selectedDatasets }) {
 export function Scene() {
   const { isOrthographic, treeBounds, selectedTile } = useContext(SceneContext)
   const controlsRef = useRef()
-  const [selectedDatasets, setSelectedDatasets] = useState(['launch_agent_5'])
+  const [selectedDatasets, setSelectedDatasets] = useState(['prysm'])
   const [camera, setCamera] = useState(null)
 
   // Get camera reference from controls
@@ -35,34 +35,72 @@ export function Scene() {
   // Spacebar view mode toggling
   useViewModes(camera, controlsRef, treeBounds, selectedTile)
 
-  // Initial pan to center of tree on load (no zoom, user controls zoom via scroll wheel)
+  // Track previous tree bounds center to compensate for layout shifts
+  const prevBoundsCenterRef = useRef(null)
   const hasInitializedRef = useRef(false)
+
+  // Initial pan and zoom to fit tree on load
+  // After initialization, compensate for layout shifts when adding agents
   useEffect(() => {
     if (!treeBounds || !controlsRef?.current || !camera) return
-    if (hasInitializedRef.current) {
-      console.log('[Scene] Initial pan skipped (already initialized)')
-      return // Only pan once on initial load
+
+    const { minX, maxX, minY, maxY } = treeBounds
+    const newCenterX = (minX + maxX) / 2
+    const newCenterY = (minY + maxY) / 2
+
+    // INITIAL SETUP: First time seeing valid bounds
+    if (!hasInitializedRef.current) {
+      console.log('[Scene] Initial camera setup - fitting tree in view')
+
+      // Calculate tree dimensions
+      const treeWidth = maxX - minX + 2 // Add padding
+      const treeHeight = maxY - minY + 2
+
+      // Calculate zoom to fit tree in view (orthographic)
+      const aspectRatio = window.innerWidth / window.innerHeight
+      const fitWidth = treeWidth / 2 / aspectRatio
+      const fitHeight = treeHeight / 2
+      const targetZ = Math.max(fitWidth, fitHeight, 5) // Minimum Z of 5
+
+      const controls = controlsRef.current
+      camera.position.x = newCenterX
+      camera.position.y = -newCenterY
+      camera.position.z = targetZ
+
+      controls.target.x = newCenterX
+      controls.target.y = -newCenterY
+      controls.target.z = 0
+
+      controls.update()
+      console.log(`[Scene] Camera positioned at z=${targetZ.toFixed(1)} to fit tree ${treeWidth.toFixed(1)}x${treeHeight.toFixed(1)}`)
+
+      prevBoundsCenterRef.current = { x: newCenterX, y: newCenterY }
+      hasInitializedRef.current = true
+      return
     }
 
-    console.log('[Scene] Running initial pan to center tree (no zoom)')
-    const { minX, maxX, minY, maxY } = treeBounds
+    // SUBSEQUENT UPDATES: Compensate for layout shift when adding/removing agents
+    if (prevBoundsCenterRef.current) {
+      const prevCenter = prevBoundsCenterRef.current
+      const deltaX = newCenterX - prevCenter.x
+      const deltaY = newCenterY - prevCenter.y
 
-    // Calculate center of tree
-    const centerX = (minX + maxX) / 2
-    const centerY = (minY + maxY) / 2
+      // Only adjust if there's a meaningful shift (> 0.1 units)
+      if (Math.abs(deltaX) > 0.1 || Math.abs(deltaY) > 0.1) {
+        const controls = controlsRef.current
 
-    // Pan to center (keep initial zoom level from camera config)
-    const controls = controlsRef.current
-    camera.position.x = centerX
-    camera.position.y = -centerY
-    // camera.position.z stays at initial value (5)
+        // Shift camera to compensate - keeps tree visually stable
+        camera.position.x += deltaX
+        camera.position.y -= deltaY // Y is inverted in world coords
+        controls.target.x += deltaX
+        controls.target.y -= deltaY
 
-    controls.target.x = centerX
-    controls.target.y = -centerY
-    controls.target.z = 0
+        controls.update()
+        console.log(`[Scene] Compensated for layout shift: dx=${deltaX.toFixed(2)}, dy=${deltaY.toFixed(2)}`)
+      }
 
-    controls.update()
-    hasInitializedRef.current = true
+      prevBoundsCenterRef.current = { x: newCenterX, y: newCenterY }
+    }
   }, [treeBounds, camera])
 
   const handleDatasetToggle = (datasetId) => {
@@ -86,7 +124,7 @@ export function Scene() {
     setSelectedDatasets(prev => {
       // If clicking the same scope, deselect and go back to default agent
       if (prev.includes(scopeId)) {
-        return ['launch_agent_5']
+        return ['prysm']
       }
       // Otherwise, select only this scope
       return [scopeId]
@@ -97,18 +135,21 @@ export function Scene() {
 
   return (
     <>
-      {/* Dataset switcher - rendered outside Canvas as DOM element */}
-      <DatasetSwitcher
-        selectedDatasets={selectedDatasets}
-        onDatasetToggle={handleDatasetToggle}
-        onScopeSelect={handleScopeSelect}
-      />
+      {/* Left panel stack - properly stacked without overlap */}
+      <div className="left-panel-stack">
+        {/* Dataset switcher - rendered outside Canvas as DOM element */}
+        <DatasetSwitcher
+          selectedDatasets={selectedDatasets}
+          onDatasetToggle={handleDatasetToggle}
+          onScopeSelect={handleScopeSelect}
+        />
 
-      {/* Tag selector - filter and navigate by semantic tags */}
-      <TagSelector />
+        {/* Tag selector - filter and navigate by semantic tags */}
+        <TagSelector />
 
-      {/* Tagged nodes list - shows all nodes matching selected tag */}
-      <TaggedNodesList />
+        {/* Tagged nodes list - shows all nodes matching selected tag */}
+        <TaggedNodesList />
+      </div>
 
       <Canvas
         key={isOrthographic ? 'ortho' : 'persp'}

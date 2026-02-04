@@ -2,21 +2,19 @@ import { buildTree, traverseTree } from '../utils/treeParser'
 
 /**
  * Calculate tree layout using Reingold-Tilford algorithm
- * Uses a compact variation of Walker with tighter horizontal spacing
+ * Uses a compact variation of Walker with tighter margins
  *
  * @param {Array} nodes - Flat array of content nodes
  * @param {Object} config - Layout configuration
  * @returns {Map} Map of node.doc_no -> {x, y, size}
  */
 function calculateReingoldTilfordLayout(nodes, config = {}) {
-  // Use tighter horizontal spacing for a more compact layout
+  // Use tighter margins for a more compact layout
   const compactConfig = {
     ...config,
-    horizontalSpacing: config.horizontalSpacing * 0.6, // 40% tighter
+    marginFactor: 1.1, // 10% margin (vs default 30%)
   }
 
-  // For now, use the same Walker algorithm but with tighter spacing
-  // This gives a compact layout without the complexity bugs
   return calculateWalkerLayout(nodes, compactConfig)
 }
 
@@ -25,10 +23,10 @@ function calculateReingoldTilfordLayout(nodes, config = {}) {
  */
 function calculateWalkerLayout(nodes, config = {}) {
   const {
-    horizontalSpacing = 1.2,
     verticalSpacing = 1.0,
     tileSize = 0.5,
     numAgentSlots = 1,  // Number of agent slots to allocate for each node
+    marginFactor = 1.3, // Default 30% margin between nodes
   } = config
 
   const layout = new Map()
@@ -39,15 +37,22 @@ function calculateWalkerLayout(nodes, config = {}) {
   }
 
   /**
-   * Get the width multiplier for a node based on number of agent slots
-   * All nodes get the same width to maintain alignment in slot-based layout
+   * Calculate the visual width of a node based on number of agent slots
+   * Must match the rendering calculation in TreeView.jsx
+   *
+   * Visual width formula (from TreeView.jsx):
+   *   tileWidth = tileSize * 0.95
+   *   tileSpacing = tileWidth * 1.1
+   *   totalWidth = (numSlots - 1) * tileSpacing
+   *   bgWidth = totalWidth + tileWidth + tileWidth * 0.3
+   *         = tileWidth * ((numSlots - 1) * 1.1 + 1.3)
    */
   function getNodeWidth() {
-    if (numAgentSlots === 1) return 1.0
+    const tileWidth = tileSize * 0.95
+    const visualWidth = tileWidth * ((numAgentSlots - 1) * 1.1 + 1.3)
 
-    // Each additional agent adds 1.1x tile width (tile + 10% gap)
-    // For 2 slots: 1.0 + 1.1 = 2.1x width
-    return 1.0 + (numAgentSlots - 1) * 1.1
+    // Add margin between nodes to prevent overlap (default 30%)
+    return visualWidth * marginFactor
   }
 
   const nodeWidth = getNodeWidth()
@@ -57,9 +62,11 @@ function calculateWalkerLayout(nodes, config = {}) {
     node._depth = depth
 
     if (node.children.length === 0) {
-      node._x = nextX * horizontalSpacing
-      nextX += nodeWidth  // Account for multi-agent width
+      // Leaf nodes: place at nextX, then advance by nodeWidth
+      node._x = nextX
+      nextX += nodeWidth
     } else {
+      // Parent nodes: first layout children, then center over them
       node.children.forEach(child => assignPositions(child, depth + 1))
 
       const leftmost = node.children[0]._x
@@ -76,10 +83,13 @@ function calculateWalkerLayout(nodes, config = {}) {
 
     if (index > 0) {
       const prevRoot = roots[index - 1]
-      const prevRightmost = getRightmostX(prevRoot)
-      const currLeftmost = getLeftmostX(root)
-      const gap = horizontalSpacing * 3
-      const shift = prevRightmost - currLeftmost + gap
+      // Get rightmost edge (center + half width) of previous tree
+      const prevRightEdge = getRightmostX(prevRoot) + nodeWidth / 2
+      // Get leftmost edge (center - half width) of current tree
+      const currLeftEdge = getLeftmostX(root) - nodeWidth / 2
+      // Add gap between trees
+      const gap = nodeWidth * 0.5  // 50% of node width as gap between trees
+      const shift = prevRightEdge - currLeftEdge + gap
       shiftTree(root, shift)
     }
   })

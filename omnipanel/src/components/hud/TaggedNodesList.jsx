@@ -78,17 +78,13 @@ export function TaggedNodesList() {
 
       <style>{`
         .tagged-nodes-list {
-          position: fixed;
-          left: 20px;
-          top: 340px;
           width: 320px;
-          max-height: calc(100vh - 380px);
+          max-height: 50vh;
           background: rgba(17, 24, 39, 0.95);
           border: 1px solid rgba(59, 130, 246, 0.5);
           border-radius: 8px;
           font-family: 'Monaco', 'Menlo', monospace;
           backdrop-filter: blur(10px);
-          z-index: 1000;
           display: flex;
           flex-direction: column;
           overflow: hidden;

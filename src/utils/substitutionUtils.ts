@@ -1,14 +1,29 @@
 /**
  * Known agent names for variable substitution
+ * Note: This list is used to find-and-replace agent names in content.
+ * Include both current and legacy names to handle Atlas updates gracefully.
  */
-export const KNOWN_AGENT_NAMES = [
+export let KNOWN_AGENT_NAMES: string[] = [
   'Spark',
   'Grove',
   'Keel',
-  'Launch Agent 3',
+  'SkyBase',      // Current name for A.6.1.1.4
+  'Skybase',      // Alternate casing
+  'Launch Agent 3', // Legacy name for A.6.1.1.4
   'Obex',
   'Launch Agent 5',
+  'Launch Agent 6',
 ];
+
+/**
+ * Update known agent names from loaded Atlas data
+ * Call this after loading agents to ensure substitution works for all names
+ */
+export const updateKnownAgentNames = (agentNames: string[]): void => {
+  // Merge with existing names to preserve legacy name support
+  const uniqueNames = new Set([...KNOWN_AGENT_NAMES, ...agentNames]);
+  KNOWN_AGENT_NAMES = Array.from(uniqueNames);
+};
 
 /**
  * Known token symbols for variable substitution
@@ -17,9 +32,11 @@ export const KNOWN_TOKEN_SYMBOLS = [
   'SPK',
   'GROVE',
   'KEEL',
+  'SKYBASE',
   'AGENT3',
   'OBEX',
   'AGENT5',
+  'AGENT6',
 ];
 
 /**

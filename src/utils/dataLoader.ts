@@ -1,14 +1,11 @@
 import type { AtlasNode } from '../types';
 import { preprocessData, preprocessNode, findNodeByDocNo, getChildren } from './treeUtils';
+import { ALL_DATA_PATHS } from '../config/dataPaths';
 
 /**
- * Data file paths
+ * Data file paths - re-exported from central config for backwards compatibility
  */
-export const DATA_FILES = {
-  atlas: '/atlas-2025-12-11.json',
-  atlasLatest: '/atlas-2026-01-14.json',
-  skybaseChangeset: '/skybase/skybase-changeset-complete.json',
-} as const;
+export const DATA_FILES = ALL_DATA_PATHS;
 
 /**
  * Changeset section structure
@@ -73,27 +70,21 @@ export interface AgentInfo {
 }
 
 /**
- * Load all comparison agents
+ * Load all comparison agents dynamically from A.6.1.1.X
+ * Names are pulled from Atlas data, not hardcoded
  */
 export const loadComparisonAgents = async (): Promise<AgentInfo[]> => {
   const atlasData = await loadAtlasData();
 
   const agents: AgentInfo[] = [];
 
-  // Extract agents from main atlas
-  const spark = findNodeByDocNo(atlasData, AGENT_DOC_NUMBERS.spark);
-  const grove = findNodeByDocNo(atlasData, AGENT_DOC_NUMBERS.grove);
-  const keel = findNodeByDocNo(atlasData, AGENT_DOC_NUMBERS.keel);
-  const launch3 = findNodeByDocNo(atlasData, AGENT_DOC_NUMBERS.launchAgent3);
-  const obex = findNodeByDocNo(atlasData, AGENT_DOC_NUMBERS.obex);
-  const launch5 = findNodeByDocNo(atlasData, AGENT_DOC_NUMBERS.launchAgent5);
-
-  if (spark) agents.push({ name: 'Spark', node: spark });
-  if (grove) agents.push({ name: 'Grove', node: grove });
-  if (keel) agents.push({ name: 'Keel', node: keel });
-  if (launch3) agents.push({ name: 'Launch Agent 3', node: launch3 });
-  if (obex) agents.push({ name: 'Obex', node: obex });
-  if (launch5) agents.push({ name: 'Launch Agent 5', node: launch5 });
+  // Extract agents from main atlas - use node.name from Atlas data
+  for (const key of Object.keys(AGENT_DOC_NUMBERS) as (keyof typeof AGENT_DOC_NUMBERS)[]) {
+    const node = findNodeByDocNo(atlasData, AGENT_DOC_NUMBERS[key]);
+    if (node) {
+      agents.push({ name: node.name, node });
+    }
+  }
 
   return agents;
 };

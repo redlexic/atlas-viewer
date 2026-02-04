@@ -1,0 +1,31 @@
+# Session Context - 2026-01-30
+
+## Recent Changes
+
+### Omnipanel (Hierarchical View)
+- **Tree layout fix**: Updated `treeLayout.js` to calculate node widths based on actual visual rendering dimensions. Added `marginFactor` config (default 1.3 = 30% gap) to prevent tile overlap.
+- **Doc_no font scaling**: In `TreeView.jsx`, doc_no text now scales down for longer section numbers (≤12 chars = full size, longer scales down to min 50%).
+- **Performance**: Optimized zoom/pan by only calling `controls.update()` when animating, reusing raycaster objects.
+- **Camera stability**: Added layout shift compensation when adding/removing agents.
+
+### Main App
+- **ComparisonPage scroll fix**: Restructured layout with fixed header and scrollable content area (`overflow: auto`).
+- **DiffPage Section Picker**: Fixed `loadedDocNos` to track `originalSections` instead of `changesetSections` so the + button properly shows loaded state.
+
+### Reports
+- **PSM Whitelisting** (`docs/reports/psm-whitelisting.md`): Reframed rate limits vs whitelisting as separate features (authorization vs throughput), not alternatives.
+- **Skybase Primitives** (`docs/drafts/skybase-primitives-report.md`): Various refinements including Distribution Reward clarification (rewards integrators, not users), payment records note, restructured sections.
+
+## Key Files
+- `omnipanel/src/layouts/treeLayout.js` - Tree layout algorithm
+- `omnipanel/src/components/TreeView.jsx` - 3D tree visualization
+- `omnipanel/src/config/planeConfig.js` - Layout config (marginFactor, verticalSpacing, tileSize)
+- `src/pages/ComparisonPage.tsx` - Agent comparison with Builder
+- `src/pages/DiffPage.tsx` - Changeset diff editor
+- `docs/drafts/skybase-primitives-report.md` - Skybase analysis
+- `docs/reports/psm-whitelisting.md` - PSM authorization analysis
+
+## Data Paths
+Configured in `src/config/dataPaths.ts` and `omnipanel/src/config/dataPaths.js`
+- Latest atlas: `public/data/atlas/atlas-2026-01-28.json`
+- Run `npm run update-atlas` to check for updates

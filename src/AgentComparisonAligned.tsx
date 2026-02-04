@@ -1,4 +1,4 @@
-import { useState, memo } from 'react';
+import { useState, memo, useEffect } from 'react';
 import {
   Box,
   Text,
@@ -25,6 +25,8 @@ import {
   IconX,
   IconCode,
   IconCopy,
+  IconLink,
+  IconSearch,
 } from '@tabler/icons-react';
 import ReactMarkdown from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
@@ -51,6 +53,8 @@ interface AgentComparisonAlignedProps {
   onVariablesEdit: () => void;
   customEdits: Record<string, { name?: string; content?: string }>;
   onCustomEditsChange: (edits: Record<string, { name?: string; content?: string }>) => void;
+  initialDocNo?: string;
+  onNavigate?: (docNo: string | null) => void;
 }
 
 // Collect all UUIDs from a node and its descendants
@@ -125,6 +129,7 @@ const AlignedNodeRow = memo(
     builderSubproxyAccount,
     customEdits,
     onCustomEditsChange,
+    highlightedDocNo,
   }: {
     nodes: (AtlasNode | null)[];
     level: number;
@@ -143,6 +148,7 @@ const AlignedNodeRow = memo(
     builderSubproxyAccount: string;
     customEdits: Record<string, { name?: string; content?: string }>;
     onCustomEditsChange: (edits: Record<string, { name?: string; content?: string }>) => void;
+    highlightedDocNo: string | null;
   }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [editedName, setEditedName] = useState('');
@@ -215,12 +221,16 @@ const AlignedNodeRow = memo(
 
             const childCount = countAllChildren(node);
 
+            const atlasUrl = `https://sky-atlas.io/#${node.doc_no}`;
+            const isHighlighted = highlightedDocNo === node.doc_no;
+
             return (
               <Box key={agentIndex} style={{ overflow: 'hidden' }}>
                 <Paper
                   p="xs"
                   mb="xs"
                   withBorder
+                  data-docno={node.doc_no}
                   style={{
                     marginLeft: level * 12,
                     borderLeft: isSelected
@@ -228,33 +238,71 @@ const AlignedNodeRow = memo(
                       : '3px solid var(--mantine-color-blue-6)',
                     overflow: 'hidden',
                     position: 'relative',
+                    outline: isHighlighted ? '2px solid var(--mantine-color-yellow-5)' : undefined,
+                    boxShadow: isHighlighted ? '0 0 10px var(--mantine-color-yellow-5)' : undefined,
+                    transition: 'outline 0.3s, box-shadow 0.3s',
                   }}
                 >
-                  <Tooltip label="View raw markdown">
-                    <ActionIcon
-                      size="xs"
-                      variant="subtle"
-                      color="gray"
-                      style={{
-                        position: 'absolute',
-                        top: 4,
-                        right: 4,
-                        zIndex: 1,
-                      }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setMarkdownViewContent({
-                          name: node.name || '',
-                          content: node.content || '',
-                        });
-                        setMarkdownViewOpen(true);
-                      }}
-                    >
-                      <IconCode size={12} />
-                    </ActionIcon>
-                  </Tooltip>
+                  <Badge
+                    size="xs"
+                    variant="filled"
+                    color="dark"
+                    style={{
+                      position: 'absolute',
+                      top: 4,
+                      left: 8,
+                      zIndex: 1,
+                    }}
+                  >
+                    {agentName}
+                  </Badge>
 
-                  <Group gap="xs" mb={4} wrap="wrap">
+                  <Group
+                    gap={4}
+                    style={{
+                      position: 'absolute',
+                      top: 4,
+                      right: 4,
+                      zIndex: 1,
+                    }}
+                  >
+                    <CopyButton value={atlasUrl}>
+                      {({ copied, copy }) => (
+                        <Tooltip label={copied ? 'Copied!' : 'Copy Atlas link'}>
+                          <ActionIcon
+                            size="xs"
+                            variant="subtle"
+                            color={copied ? 'green' : 'gray'}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              copy();
+                            }}
+                          >
+                            <IconLink size={12} />
+                          </ActionIcon>
+                        </Tooltip>
+                      )}
+                    </CopyButton>
+                    <Tooltip label="View raw markdown">
+                      <ActionIcon
+                        size="xs"
+                        variant="subtle"
+                        color="gray"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setMarkdownViewContent({
+                            name: node.name || '',
+                            content: node.content || '',
+                          });
+                          setMarkdownViewOpen(true);
+                        }}
+                      >
+                        <IconCode size={12} />
+                      </ActionIcon>
+                    </Tooltip>
+                  </Group>
+
+                  <Group gap="xs" mb={4} mt={20} wrap="wrap">
                     <Radio
                       size="xs"
                       name={`section-${docNoSuffix}`}
@@ -597,6 +645,7 @@ const AlignedNodeRow = memo(
                 builderSubproxyAccount={builderSubproxyAccount}
                 customEdits={customEdits}
                 onCustomEditsChange={onCustomEditsChange}
+                highlightedDocNo={highlightedDocNo}
               />
             ))}
             {childSections.length > 0 && (
@@ -690,6 +739,73 @@ const AlignedNodeRow = memo(
   }
 );
 
+/**
+ * Parse a doc_no from user input (either direct doc_no or sky-atlas.io URL)
+ */
+const parseDocNoFromInput = (input: string): string | null => {
+  const trimmed = input.trim();
+
+  // Check if it's a sky-atlas.io URL
+  const urlMatch = trimmed.match(/sky-atlas\.io\/?#?(A\.[0-9.]+)/i);
+  if (urlMatch) {
+    return urlMatch[1];
+  }
+
+  // Check if it's a direct doc_no (starts with A.)
+  if (/^A\.[0-9.]+$/.test(trimmed)) {
+    return trimmed;
+  }
+
+  return null;
+};
+
+/**
+ * Get all ancestor doc_no suffixes for a given doc_no
+ * e.g., A.6.1.1.5.2.6.1 -> [".2", ".2.6", ".2.6.1"]
+ */
+const getAncestorSuffixes = (docNo: string): string[] => {
+  const suffix = getDocNoSuffix(docNo);
+  if (!suffix) return [];
+
+  const parts = suffix.split('.').filter(Boolean);
+  const suffixes: string[] = [];
+
+  // Include all ancestors - from first level down to immediate parent
+  for (let i = 1; i < parts.length; i++) {
+    suffixes.push('.' + parts.slice(0, i).join('.'));
+  }
+
+  return suffixes;
+};
+
+/**
+ * Find all UUIDs that match the given doc_no suffixes across all agent trees
+ */
+const findUuidsForSuffixes = (
+  nodes: AtlasNode[],
+  suffixes: Set<string>
+): Set<string> => {
+  const uuids = new Set<string>();
+
+  const traverse = (node: AtlasNode) => {
+    const nodeSuffix = getDocNoSuffix(node.doc_no);
+    if (suffixes.has(nodeSuffix)) {
+      uuids.add(node.uuid);
+    }
+
+    const children = getChildren(node);
+    for (const child of children) {
+      traverse(child);
+    }
+  };
+
+  for (const node of nodes) {
+    traverse(node);
+  }
+
+  return uuids;
+};
+
 export const AgentComparisonAligned = ({
   agents,
   selectedSections,
@@ -706,11 +822,16 @@ export const AgentComparisonAligned = ({
   onVariablesEdit,
   customEdits,
   onCustomEditsChange,
+  initialDocNo,
+  onNavigate,
 }: AgentComparisonAlignedProps) => {
   const agentNames = agents.map((a) => a.name);
   const rootNodes = agents.map((a) => a.node);
 
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
+  const [searchInput, setSearchInput] = useState(initialDocNo || '');
+  const [highlightedDocNo, setHighlightedDocNo] = useState<string | null>(null);
+  const [hasInitialized, setHasInitialized] = useState(false);
 
   const handleToggle = (uuid: string) => {
     setExpandedNodes((prev) => {
@@ -748,11 +869,76 @@ export const AgentComparisonAligned = ({
     });
   };
 
+  // Navigate to a doc_no (expand ancestors, highlight, scroll)
+  const navigateToDocNo = (docNo: string) => {
+    // Get all ancestor suffixes that need to be expanded
+    const ancestorSuffixes = getAncestorSuffixes(docNo);
+    const suffixSet = new Set(ancestorSuffixes);
+
+    // Also add the ROOT suffix for the agent root level
+    suffixSet.add('');
+
+    // Find all UUIDs across all agents that match these suffixes
+    const uuidsToExpand = findUuidsForSuffixes(rootNodes, suffixSet);
+
+    // Expand all matching nodes
+    setExpandedNodes((prev) => {
+      const newSet = new Set(prev);
+      uuidsToExpand.forEach((uuid) => newSet.add(uuid));
+      return newSet;
+    });
+
+    // Highlight the target doc_no
+    setHighlightedDocNo(docNo);
+
+    // Update URL via callback
+    onNavigate?.(docNo);
+
+    // Try to scroll to the element with retries (DOM may need time to update)
+    let attempts = 0;
+    const maxAttempts = 10;
+    const tryScroll = () => {
+      const element = document.querySelector(`[data-docno="${docNo}"]`);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else if (attempts < maxAttempts) {
+        attempts++;
+        setTimeout(tryScroll, 100);
+      }
+    };
+    setTimeout(tryScroll, 50);
+
+    // Clear highlight after 3 seconds
+    setTimeout(() => {
+      setHighlightedDocNo(null);
+    }, 3000);
+  };
+
+  // Handle initial navigation from URL
+  useEffect(() => {
+    if (!hasInitialized && initialDocNo && rootNodes.length > 0) {
+      setHasInitialized(true);
+      // Small delay to ensure DOM is ready
+      setTimeout(() => {
+        navigateToDocNo(initialDocNo);
+      }, 100);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialDocNo, rootNodes.length, hasInitialized]);
+
+  const handleSearch = () => {
+    const docNo = parseDocNoFromInput(searchInput);
+    if (!docNo) {
+      return;
+    }
+    navigateToDocNo(docNo);
+  };
+
   const totalColumns = agents.length + (showBuilder ? 1 : 0);
 
   return (
     <Box style={{ margin: 0, padding: 0 }}>
-      <Group gap="xs" mb="sm">
+      <Group gap="xs" mb="sm" align="flex-end">
         <Button
           leftSection={<IconFolderOpen size={14} />}
           onClick={expandAll}
@@ -769,6 +955,27 @@ export const AgentComparisonAligned = ({
           size="xs"
         >
           Collapse All
+        </Button>
+        <TextInput
+          placeholder="A.6.1.1.4.2.1 or sky-atlas.io link"
+          value={searchInput}
+          onChange={(e) => setSearchInput(e.currentTarget.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              handleSearch();
+            }
+          }}
+          size="xs"
+          style={{ width: 280 }}
+          leftSection={<IconSearch size={14} />}
+        />
+        <Button
+          onClick={handleSearch}
+          variant="light"
+          size="xs"
+          disabled={!searchInput.trim()}
+        >
+          Go
         </Button>
       </Group>
 
@@ -920,6 +1127,7 @@ export const AgentComparisonAligned = ({
         builderSubproxyAccount={builderSubproxyAccount}
         customEdits={customEdits}
         onCustomEditsChange={onCustomEditsChange}
+        highlightedDocNo={highlightedDocNo}
       />
     </Box>
   );

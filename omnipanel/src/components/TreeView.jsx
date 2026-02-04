@@ -19,14 +19,14 @@ function PulsingBorder({ position, width, height, thickness, color, emissiveColo
   const rightRef = useRef()
 
   // Pulse animation for highlighted borders
+  // OPTIMIZATION: Only update when refs are ready, use direct access instead of forEach
   useFrame((state) => {
     const pulse = Math.sin(state.clock.elapsedTime * 3) * 0.3 + 1.0 // Oscillate between 0.7 and 1.3
-    const refs = [topRef, bottomRef, leftRef, rightRef]
-    refs.forEach(ref => {
-      if (ref.current) {
-        ref.current.emissiveIntensity = emissiveIntensity * pulse
-      }
-    })
+    const intensity = emissiveIntensity * pulse
+    if (topRef.current) topRef.current.emissiveIntensity = intensity
+    if (bottomRef.current) bottomRef.current.emissiveIntensity = intensity
+    if (leftRef.current) leftRef.current.emissiveIntensity = intensity
+    if (rightRef.current) rightRef.current.emissiveIntensity = intensity
   })
 
   return (
@@ -83,16 +83,34 @@ function ClickableTile({ node, position, agentColor, unifiedDocNo }) {
   const isSelected = selectedTile?.doc_no === unifiedDocNo
 
   // Animate levitation and scale (selected tiles float higher and grow)
+  // OPTIMIZATION: Stop animating when close to target
   useFrame((state, delta) => {
     if (groupRef.current) {
       const targetZ = isSelected ? 0.1 : (isClicked ? 0.05 : 0)
       const targetScale = isSelected ? 1.1 : 1.0
 
+      const currentZ = groupRef.current.position.z
+      const currentScale = groupRef.current.scale.x
+
+      // Early exit if already at target (within threshold)
+      const zDiff = Math.abs(currentZ - targetZ)
+      const scaleDiff = Math.abs(currentScale - targetScale)
+      if (zDiff < 0.001 && scaleDiff < 0.001) {
+        // Snap to exact values and stop
+        if (zDiff > 0) groupRef.current.position.z = targetZ
+        if (scaleDiff > 0) {
+          groupRef.current.scale.x = targetScale
+          groupRef.current.scale.y = targetScale
+          groupRef.current.scale.z = targetScale
+        }
+        return
+      }
+
       // Smooth animations
-      groupRef.current.position.z += (targetZ - groupRef.current.position.z) * delta * 5
-      groupRef.current.scale.x += (targetScale - groupRef.current.scale.x) * delta * 8
-      groupRef.current.scale.y += (targetScale - groupRef.current.scale.y) * delta * 8
-      groupRef.current.scale.z += (targetScale - groupRef.current.scale.z) * delta * 8
+      groupRef.current.position.z += (targetZ - currentZ) * delta * 5
+      groupRef.current.scale.x += (targetScale - currentScale) * delta * 8
+      groupRef.current.scale.y += (targetScale - currentScale) * delta * 8
+      groupRef.current.scale.z += (targetScale - currentScale) * delta * 8
     }
   })
 
@@ -102,7 +120,14 @@ function ClickableTile({ node, position, agentColor, unifiedDocNo }) {
     : { color: agentColor || getNodeColor(node.type), opacity: 0.6, transparent: true }
 
   // Calculate text size based on tile size
-  const docNoFontSize = position.size * 0.15
+  // Scale down doc_no font for longer section numbers to fit within tile
+  const docNoLength = node.doc_no?.length || 0
+  const baseDocNoSize = position.size * 0.15
+  // Short doc_nos (≤12 chars like "A.6.1.1.4.2") use full size
+  // Longer ones scale down proportionally, with a minimum of 50% base size
+  const docNoScale = docNoLength <= 12 ? 1.0 : Math.max(0.5, 12 / docNoLength)
+  const docNoFontSize = baseDocNoSize * docNoScale
+
   const nameFontSize = position.size * 0.1
   const typeFontSize = position.size * 0.08
 
@@ -185,26 +210,43 @@ export function TreeView({ selectedDatasets = ['launch_agent_5'] }) {
   const [useSampleData, setUseSampleData] = useState(false)
 
   // Load data when selected datasets change
+  // OPTIMIZATION: Don't show loading state when adding agents - keep existing tree visible
   useEffect(() => {
     const loadData = async () => {
       try {
-        setIsLoading(true)
-        const loadedData = {}
+        // Only show loading if we have no data yet (initial load)
+        const hasExistingData = Object.keys(agentsData).length > 0
+        if (!hasExistingData) {
+          setIsLoading(true)
+        }
 
-        // Load all selected datasets
+        // Keep existing data while loading new datasets
+        const loadedData = { ...agentsData }
+
+        // Load only datasets we don't already have
         for (const datasetId of selectedDatasets) {
-          const dataset = DATASETS[datasetId.toUpperCase().replace(/-/g, '_')]
-          if (dataset) {
-            const data = await dataset.loader()
-            loadedData[datasetId] = data
+          if (!loadedData[datasetId]) {
+            const dataset = DATASETS[datasetId.toUpperCase().replace(/-/g, '_')]
+            if (dataset) {
+              const data = await dataset.loader()
+              loadedData[datasetId] = data
 
-            // Log tree statistics
-            const stats = getTreeStats(data)
-            console.log(`${dataset.name} loaded:`, stats)
+              // Log tree statistics
+              const stats = getTreeStats(data)
+              console.log(`${dataset.name} loaded:`, stats)
+            }
           }
         }
 
-        setAgentsData(loadedData)
+        // Remove datasets that are no longer selected
+        const newData = {}
+        for (const datasetId of selectedDatasets) {
+          if (loadedData[datasetId]) {
+            newData[datasetId] = loadedData[datasetId]
+          }
+        }
+
+        setAgentsData(newData)
         setUseSampleData(false)
       } catch (err) {
         console.error(`Failed to load datasets:`, err)
@@ -398,13 +440,13 @@ export function TreeView({ selectedDatasets = ['launch_agent_5'] }) {
     'scope_a4': '#92400e',     // brown
     'scope_a5': '#78350f',     // dark brown
     'scope_a6': '#fbbf24',     // gold (agent scope)
-    // Agents
+    // Agents (IDs match DATASETS in agentDataLoader.js)
     'spark': '#ef4444',        // red
     'grove': '#10b981',        // green
     'keel': '#3b82f6',         // blue
-    'launch_agent_3': '#f59e0b',  // amber
+    'skybase': '#f59e0b',      // amber
     'obex': '#8b5cf6',         // purple
-    'launch_agent_5': '#06b6d4',  // cyan
+    'prysm': '#06b6d4',        // cyan
   }
 
   return (

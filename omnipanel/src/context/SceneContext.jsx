@@ -1,4 +1,5 @@
 import { createContext, useState, useCallback, useEffect, useMemo } from 'react'
+import { DATA_FILES } from '../config/dataPaths'
 
 export const SceneContext = createContext()
 
@@ -27,7 +28,7 @@ export function SceneProvider({ children }) {
 
   // Load tag index on mount
   useEffect(() => {
-    fetch('/tagging-model.json')
+    fetch(DATA_FILES.taggingModel)
       .then(res => res.json())
       .then(data => {
         setTagIndex(data)

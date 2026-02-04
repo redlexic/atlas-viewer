@@ -48,22 +48,22 @@ export const TREE_CONFIG = {
   PHI: 1.618,
 
   /**
-   * Horizontal spacing between sibling nodes
-   * - Affects: Overall tree width and node density
-   * - Increase: Nodes spread further apart horizontally (wider tree)
-   * - Decrease: Nodes closer together (more compact tree)
-   * - Current: Increased to accommodate side-by-side multi-agent tiles (up to 3 agents)
+   * Margin factor between sibling nodes (multiplier on visual width)
+   * - Affects: Gap between adjacent nodes
+   * - Increase: More space between nodes (default 1.3 = 30% margin)
+   * - Decrease: Nodes closer together (1.1 = 10% margin)
+   * - Note: Actual spacing is calculated from tileSize and numAgentSlots
    */
-  horizontalSpacing: 1.618 * 1.5,
+  marginFactor: 1.3,
 
   /**
    * Vertical spacing between parent and child levels (rows)
    * - Affects: Overall tree height and row separation
    * - Increase: More space between levels (taller tree)
    * - Decrease: Levels closer together (more compact vertically)
-   * - Units: Same as world coordinates
+   * - Increased to make tree taller and use more vertical screen space
    */
-  verticalSpacing: 3.5,
+  verticalSpacing: 4.5,
 
   /**
    * Size of each tile/node (square dimensions)

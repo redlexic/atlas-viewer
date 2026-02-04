@@ -135,16 +135,12 @@ export function TagSelector() {
 
       <style>{`
         .tag-selector {
-          position: fixed;
-          top: 165px;
-          left: 20px;
           background: rgba(17, 24, 39, 0.9);
           border: 1px solid rgba(59, 130, 246, 0.5);
           border-radius: 8px;
           padding: 12px 16px;
           font-family: 'Monaco', 'Menlo', monospace;
           backdrop-filter: blur(10px);
-          z-index: 1000;
           max-width: 320px;
         }
 

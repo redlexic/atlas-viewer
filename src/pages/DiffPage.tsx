@@ -207,22 +207,58 @@ function renderDiffLine(line: DiffLine, side: 'original' | 'modified', index: nu
 }
 
 /**
- * Check if the only change between original and modified is the "Launch Agent 3" → "Skybase" rename
+ * Check if the only change between original and modified is an agent name/token rename
+ * (e.g., "Launch Agent 3" → "SkyBase", "AGENT3" → "SKYBASE")
  */
 function isRenameOnly(original: AtlasNode | undefined, modified: ChangesetSection | EditableSection | undefined): boolean {
   if (!original || !modified) return false;
 
-  // Apply the rename substitution to original
-  const substitutedName = (original.name || '').replace(/Launch Agent 3/g, 'Skybase');
-  const substitutedContent = (original.content || '').replace(/Launch Agent 3/g, 'Skybase');
+  // Get the target agent name from the modified content
+  // This is the name we expect to see after substitution
+  const modifiedName = modified.name || '';
+  const modifiedContent = modified.content || '';
 
-  // Also handle AGENT3 → SKYBASE token rename
-  const finalName = substitutedName.replace(/AGENT3/g, 'SKYBASE');
-  const finalContent = substitutedContent.replace(/AGENT3/g, 'SKYBASE');
+  // Apply agent name substitutions from all known agent names to the target
+  let substitutedName = original.name || '';
+  let substitutedContent = original.content || '';
+
+  // Try substituting each known agent name with the modified name's agent
+  // First, try to detect what agent name is in the modified version
+  const knownNames = ['Spark', 'Grove', 'Keel', 'SkyBase', 'Skybase', 'Launch Agent 3',
+                      'Launch Agent 4', 'Launch Agent 5', 'Launch Agent 6', 'Obex'];
+
+  for (const knownName of knownNames) {
+    if (modifiedName.includes(knownName) || modifiedContent.includes(knownName)) {
+      // Found the target name, now substitute all other known names with it
+      for (const sourceName of knownNames) {
+        if (sourceName !== knownName) {
+          const regex = new RegExp(sourceName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
+          substitutedName = substitutedName.replace(regex, knownName);
+          substitutedContent = substitutedContent.replace(regex, knownName);
+        }
+      }
+      break;
+    }
+  }
+
+  // Also handle token symbol renames (AGENT3 → SKYBASE, etc.)
+  const tokenMappings: [RegExp, string][] = [
+    [/AGENT3/g, 'SKYBASE'],
+    [/AGENT4/g, 'SKYBASE'],
+    [/AGENT5/g, 'AGENT5'],
+    [/AGENT6/g, 'AGENT6'],
+  ];
+
+  for (const [pattern, replacement] of tokenMappings) {
+    if (modifiedContent.includes(replacement)) {
+      substitutedName = substitutedName.replace(pattern, replacement);
+      substitutedContent = substitutedContent.replace(pattern, replacement);
+    }
+  }
 
   // Compare with modified (normalize whitespace)
-  const nameMatch = finalName.replace(/\s+/g, ' ').trim() === (modified.name || '').replace(/\s+/g, ' ').trim();
-  const contentMatch = finalContent.replace(/\s+/g, ' ').trim() === (modified.content || '').replace(/\s+/g, ' ').trim();
+  const nameMatch = substitutedName.replace(/\s+/g, ' ').trim() === modifiedName.replace(/\s+/g, ' ').trim();
+  const contentMatch = substitutedContent.replace(/\s+/g, ' ').trim() === modifiedContent.replace(/\s+/g, ' ').trim();
 
   return nameMatch && contentMatch;
 }
@@ -654,7 +690,7 @@ export function DiffPage() {
         // Build original sections map
         const originals = new Map<string, AtlasNode>();
 
-        // Find Launch Agent 3 and flatten it
+        // Find agent A.6.1.1.4 (SkyBase/Launch Agent 3) and flatten it
         const la3Node = findNodeByDocNo(atlas, AGENT_DOC_NUMBERS.launchAgent3);
         if (la3Node) {
           const la3Sections = flattenAgentSections(la3Node);
@@ -983,10 +1019,10 @@ export function DiffPage() {
     });
   }, [originalSections, changesetSections]);
 
-  // Get doc_nos already in changeset for the picker
+  // Get doc_nos already loaded (in originalSections) for the picker
   const loadedDocNos = useMemo(() => {
-    return new Set(changesetSections.keys());
-  }, [changesetSections]);
+    return new Set(originalSections.keys());
+  }, [originalSections]);
 
   // Compute stats
   const stats = useMemo(() => {

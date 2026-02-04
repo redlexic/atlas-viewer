@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useMemo } from 'react'
 import { useThree, useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 
@@ -23,6 +23,12 @@ export function useZoomToTile(selectedTile, controlsRef, isOrthographic) {
   // For detecting tile changes
   const previousTileRef = useRef(null)
 
+  // Reusable objects to avoid GC pressure (optimization)
+  const raycaster = useMemo(() => new THREE.Raycaster(), [])
+  const mouseVec = useMemo(() => new THREE.Vector2(), [])
+  const planeZ = useMemo(() => new THREE.Plane(new THREE.Vector3(0, 0, 1), 0), [])
+  const intersectPoint = useMemo(() => new THREE.Vector3(), [])
+
   // Pan camera to center on selected tile (without changing zoom)
   useEffect(() => {
     if (selectedTile && selectedTile.x !== undefined && selectedTile.y !== undefined && controlsRef?.current) {
@@ -40,11 +46,13 @@ export function useZoomToTile(selectedTile, controlsRef, isOrthographic) {
   }, [selectedTile, controlsRef])
 
   // Smooth camera movement animation
+  // OPTIMIZATION: Only runs expensive updates when actually animating
   useFrame((_state, delta) => {
     if (!controlsRef?.current) return
 
     const controls = controlsRef.current
     const camPos = camera.position
+    let needsUpdate = false
 
     // Priority 1: Pan to selected tile (maintain current zoom)
     if (targetPosition.current !== null) {
@@ -69,6 +77,7 @@ export function useZoomToTile(selectedTile, controlsRef, isOrthographic) {
         controls.target.x = newX
         controls.target.y = newY
       }
+      needsUpdate = true
     }
     // Priority 2: Mouse wheel zooming toward cursor
     else if (targetZoom.current !== null) {
@@ -100,13 +109,16 @@ export function useZoomToTile(selectedTile, controlsRef, isOrthographic) {
         camera.position.set(newX, newY, newZ)
         controls.target.set(newX, newY, 0)
       }
+      needsUpdate = true
     }
 
-    if (isOrthographic) {
-      camera.updateProjectionMatrix()
+    // OPTIMIZATION: Only update when actually animating
+    if (needsUpdate) {
+      if (isOrthographic) {
+        camera.updateProjectionMatrix()
+      }
+      controls.update()
     }
-
-    controls.update()
   })
 
   // Custom wheel handler for zoom-toward-mouse
@@ -133,11 +145,9 @@ export function useZoomToTile(selectedTile, controlsRef, isOrthographic) {
       }
 
       // Raycast to z=0 plane to get world position under mouse
-      const raycaster = new THREE.Raycaster()
-      raycaster.setFromCamera(new THREE.Vector2(mouseNDC.x, mouseNDC.y), camera)
-
-      const planeZ = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0)
-      const intersectPoint = new THREE.Vector3()
+      // OPTIMIZATION: Reuse objects to avoid GC pressure
+      mouseVec.set(mouseNDC.x, mouseNDC.y)
+      raycaster.setFromCamera(mouseVec, camera)
       raycaster.ray.intersectPlane(planeZ, intersectPoint)
 
       if (!intersectPoint) return

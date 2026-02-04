@@ -13,9 +13,9 @@ export function DatasetSwitcher({ selectedDatasets, onDatasetToggle, onScopeSele
     'spark': '#ef4444',        // red
     'grove': '#10b981',        // green
     'keel': '#3b82f6',         // blue
-    'launch_agent_3': '#f59e0b',  // amber
+    'skybase': '#f59e0b',      // amber
     'obex': '#8b5cf6',         // purple
-    'launch_agent_5': '#06b6d4',  // cyan
+    'prysm': '#06b6d4',        // cyan
   }
 
   // Separate scopes from agents
@@ -94,16 +94,12 @@ export function DatasetSwitcher({ selectedDatasets, onDatasetToggle, onScopeSele
 
       <style>{`
         .dataset-switcher {
-          position: fixed;
-          top: 70px;
-          left: 20px;
           background: rgba(17, 24, 39, 0.9);
           border: 1px solid rgba(59, 130, 246, 0.5);
           border-radius: 8px;
           padding: 12px 16px;
           font-family: 'Monaco', 'Menlo', monospace;
           backdrop-filter: blur(10px);
-          z-index: 1000;
           display: flex;
           flex-direction: column;
           gap: 10px;

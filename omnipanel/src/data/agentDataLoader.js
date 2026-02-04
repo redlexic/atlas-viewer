@@ -3,17 +3,19 @@
  * Handles fetching and parsing agent JSON files
  */
 
+import { ATLAS_FILES } from '../config/dataPaths'
+
 /**
  * Load agent data from a JSON file
- * @param {string} filename - JSON filename in /public directory
+ * @param {string} path - Full path to JSON file (relative to public/)
  * @returns {Promise<Object>} - Parsed agent data
  */
-export async function loadAgentData(filename) {
+export async function loadAgentData(path) {
   try {
-    const response = await fetch(`/${filename}`)
+    const response = await fetch(path)
 
     if (!response.ok) {
-      throw new Error(`Failed to load ${filename}: ${response.statusText}`)
+      throw new Error(`Failed to load ${path}: ${response.statusText}`)
     }
 
     const data = await response.json()
@@ -29,7 +31,7 @@ export async function loadAgentData(filename) {
  * @returns {Promise<Array>} - Full Atlas data
  */
 export async function loadAtlas() {
-  return loadAgentData('atlas-2026-01-14.json')
+  return loadAgentData(ATLAS_FILES.current)
 }
 
 /**
@@ -107,19 +109,22 @@ export async function loadKeelAgent() {
 }
 
 /**
- * Load Launch Agent 3 data (extract from Full Atlas)
- * @returns {Promise<Array>} - Launch Agent 3 subtree
+ * Load agent at A.6.1.1.4 (SkyBase, formerly Launch Agent 3)
+ * @returns {Promise<Array>} - Agent subtree
  */
-export async function loadLaunchAgent3() {
+export async function loadAgent4() {
   const atlas = await loadAtlas()
   const agent = findNodeByDocNo(atlas, 'A.6.1.1.4')
 
   if (!agent) {
-    throw new Error('Launch Agent 3 (A.6.1.1.4) not found in Atlas data')
+    throw new Error('Agent A.6.1.1.4 not found in Atlas data')
   }
 
   return [agent]
 }
+
+// Legacy alias for backwards compatibility
+export const loadLaunchAgent3 = loadAgent4
 
 /**
  * Load Obex Agent data (extract from Full Atlas)
@@ -137,19 +142,22 @@ export async function loadObexAgent() {
 }
 
 /**
- * Load Launch Agent 5 data (extract from Full Atlas)
- * @returns {Promise<Array>} - Launch Agent 5 subtree
+ * Load agent at A.6.1.1.6 (formerly Launch Agent 5)
+ * @returns {Promise<Array>} - Agent subtree
  */
-export async function loadLaunchAgent5() {
+export async function loadAgent6() {
   const atlas = await loadAtlas()
   const agent = findNodeByDocNo(atlas, 'A.6.1.1.6')
 
   if (!agent) {
-    throw new Error('Launch Agent 5 (A.6.1.1.6) not found in Atlas data')
+    throw new Error('Agent A.6.1.1.6 not found in Atlas data')
   }
 
   return [agent]
 }
+
+// Legacy alias for backwards compatibility
+export const loadLaunchAgent5 = loadAgent6
 
 /**
  * Load a specific Atlas scope by doc_no
@@ -176,6 +184,7 @@ export const loadScopeA6 = () => loadScope('A.6')
 
 /**
  * Available datasets
+ * Note: Agent IDs must match keys used in color mappings (DatasetSwitcher.jsx, TreeView.jsx)
  */
 export const DATASETS = {
   // Atlas Scopes (A.0 through A.6) - only one viewable at a time
@@ -186,13 +195,54 @@ export const DATASETS = {
   SCOPE_A4: { id: 'scope_a4', name: 'A.4 Protocol', loader: loadScopeA4, isScope: true },
   SCOPE_A5: { id: 'scope_a5', name: 'A.5 Accessibility', loader: loadScopeA5, isScope: true },
   SCOPE_A6: { id: 'scope_a6', name: 'A.6 Agent', loader: loadScopeA6, isScope: true },
-  // Individual agents (can be combined for comparison)
-  SPARK: { id: 'spark', name: 'Spark', loader: loadSparkAgent },
-  GROVE: { id: 'grove', name: 'Grove', loader: loadGroveAgent },
-  KEEL: { id: 'keel', name: 'Keel', loader: loadKeelAgent },
-  LAUNCH_AGENT_3: { id: 'launch_agent_3', name: 'Launch Agent 3', loader: loadLaunchAgent3 },
-  OBEX: { id: 'obex', name: 'Obex', loader: loadObexAgent },
-  LAUNCH_AGENT_5: { id: 'launch_agent_5', name: 'Launch Agent 5', loader: loadLaunchAgent5 },
+  // Individual agents - IDs match color keys in DatasetSwitcher/TreeView
+  SPARK: { id: 'spark', name: 'Spark', docNo: 'A.6.1.1.1', loader: loadSparkAgent },
+  GROVE: { id: 'grove', name: 'Grove', docNo: 'A.6.1.1.2', loader: loadGroveAgent },
+  KEEL: { id: 'keel', name: 'Keel', docNo: 'A.6.1.1.3', loader: loadKeelAgent },
+  SKYBASE: { id: 'skybase', name: 'SkyBase', docNo: 'A.6.1.1.4', loader: loadAgent4 },
+  OBEX: { id: 'obex', name: 'Obex', docNo: 'A.6.1.1.5', loader: loadObexAgent },
+  PRYSM: { id: 'prysm', name: 'Prysm', docNo: 'A.6.1.1.6', loader: loadAgent6 },
+}
+
+/**
+ * Load an agent and return both data and its actual name from Atlas
+ * @param {string} docNo - The agent doc_no (e.g., 'A.6.1.1.4')
+ * @returns {Promise<{name: string, data: Array}>}
+ */
+export async function loadAgentWithName(docNo) {
+  const atlas = await loadAtlas()
+  const agent = findNodeByDocNo(atlas, docNo)
+
+  if (!agent) {
+    throw new Error(`Agent ${docNo} not found in Atlas data`)
+  }
+
+  return { name: agent.name, data: [agent] }
+}
+
+/**
+ * Get all agents from A.6.1.1.X with their current names
+ * @returns {Promise<Array<{id: string, docNo: string, name: string, loader: Function}>>}
+ */
+export async function getAllAgentsWithNames() {
+  const atlas = await loadAtlas()
+  const agents = []
+
+  // Find all agents under A.6.1.1
+  for (let i = 1; i <= 10; i++) {
+    const docNo = `A.6.1.1.${i}`
+    const agent = findNodeByDocNo(atlas, docNo)
+    if (agent) {
+      agents.push({
+        id: `agent_${i}`,
+        docNo,
+        name: agent.name,
+        loader: async () => [agent]
+      })
+    }
+  }
+
+  return agents
 }
 
 /**

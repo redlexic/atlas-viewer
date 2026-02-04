@@ -1,3 +1,17 @@
+/* CSS Reset for full-screen app */
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+*, *::before, *::after {
+  box-sizing: inherit;
+}
+
 /* Scoped styles for hierarchical view - don't affect other pages */
 .hierarchical-view-container {
   margin: 0;
@@ -7,17 +21,34 @@
   background: #0f172a;
   color: white;
   overflow: hidden;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   position: relative;
 }
 
 .app {
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+}
+
+/* Left panel container - stacks DatasetSwitcher, TagSelector, TaggedNodesList */
+.left-panel-stack {
+  position: fixed;
+  top: 70px;
+  left: 20px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: calc(100vh - 100px);
+  pointer-events: none;
+}
+
+.left-panel-stack > * {
+  pointer-events: auto;
 }
 
 /* Scene Container */
