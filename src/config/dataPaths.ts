@@ -10,9 +10,11 @@
  */
 export const ATLAS_FILES = {
   /** Current/latest atlas data */
-  current: '/data/atlas/atlas-2026-01-28.json',
+  current: '/data/atlas/atlas-2026-02-10.json',
   /** Historical atlas versions */
   history: {
+    '2026-02-10': '/data/atlas/atlas-2026-02-10.json',
+    '2026-02-04': '/data/atlas/atlas-2026-02-04.json',
     '2026-01-28': '/data/atlas/atlas-2026-01-28.json',
     '2026-01-26': '/data/atlas/atlas-2026-01-26.json',
     '2026-01-23': '/data/atlas/atlas-2026-01-23.json',

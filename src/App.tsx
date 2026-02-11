@@ -4,6 +4,7 @@ import { AtlasViewerPage } from './pages/AtlasViewerPage';
 import { ComparisonPage } from './pages/ComparisonPage';
 import { HierarchicalViewPage } from './pages/HierarchicalViewPage';
 import { DiffPage } from './pages/DiffPage';
+import { SynomePage } from './pages/SynomePage';
 
 function Navigation() {
   const location = useLocation();
@@ -44,6 +45,14 @@ function Navigation() {
           >
             Changeset Diff
           </Button>
+          <Button
+            component={Link}
+            to="/synome"
+            variant={location.pathname === '/synome' ? 'filled' : 'light'}
+            color={location.pathname === '/synome' ? 'violet' : 'gray'}
+          >
+            Synome Graph
+          </Button>
         </Group>
       </Container>
     </Box>
@@ -59,6 +68,7 @@ function App() {
         <Route path="/comparison" element={<ComparisonPage />} />
         <Route path="/hierarchical" element={<HierarchicalViewPage />} />
         <Route path="/diff" element={<DiffPage />} />
+        <Route path="/synome" element={<SynomePage />} />
       </Routes>
     </Router>
   );
