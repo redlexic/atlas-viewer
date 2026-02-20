@@ -399,7 +399,6 @@ function InstanceInventory({ instances, addresses }: InstanceInventoryProps) {
               <Text fw={600}>Instances ({instances.length})</Text>
             </Group>
             <Divider />
-            <ScrollArea h={400}>
             <Table striped highlightOnHover>
               <Table.Thead>
                 <Table.Tr>
@@ -432,7 +431,6 @@ function InstanceInventory({ instances, addresses }: InstanceInventoryProps) {
                 ))}
               </Table.Tbody>
             </Table>
-          </ScrollArea>
         </Stack>
       </Paper>
 
